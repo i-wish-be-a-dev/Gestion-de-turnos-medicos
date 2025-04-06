@@ -1,0 +1,166 @@
+{
+	"info": {
+		"_postman_id": "8193965b-bec3-4ccc-ad14-5819bfa6abbc",
+		"name": "Gestion-Clientes-Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26690346"
+	},
+	"item": [
+		{
+			"name": "new customer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nombre\": \"Jorge\",\r\n  \"apellido\": \"Rafael\",\r\n  \"email\": \"jorferafael2@mail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/v1/usuarios",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"v1",
+						"usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "put customer",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nombre\": \"Tomas\",\r\n  \"apellido\": \"Doe\",\r\n  \"email\": \"tomasdoe2@mail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/v1/usuarios/502",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"v1",
+						"usuarios",
+						"502"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get customer",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/api/v1/usuarios",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"v1",
+						"usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get customer id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/api/v1/usuarios/202",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"v1",
+						"usuarios",
+						"202"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete customer id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8090/api/v1/usuarios/152",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"v1",
+						"usuarios",
+						"152"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
