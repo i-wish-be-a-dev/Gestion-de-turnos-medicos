@@ -1,0 +1,7 @@
+com\gestion\clientes\service\UsuarioServiceImp.class
+com\gestion\clientes\repository\UsuarioRepository.class
+com\gestion\clientes\controller\UsuarioController.class
+com\gestion\clientes\model\Usuario.class
+com\gestion\clientes\GestionClientesBackendApplication.class
+com\gestion\clientes\exception\ResourceNotFoundException.class
+com\gestion\clientes\service\UsuarioService.class
