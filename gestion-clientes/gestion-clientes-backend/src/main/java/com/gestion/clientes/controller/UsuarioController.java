@@ -6,6 +6,7 @@ package com.gestion.clientes.controller;
 
 import com.gestion.clientes.model.Usuario;
 import com.gestion.clientes.repository.UsuarioRepository;
+import com.gestion.clientes.response.ResponseHandler;
 import com.gestion.clientes.service.UsuarioService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -32,36 +33,32 @@ public class UsuarioController {
     @Autowired
     UsuarioService usuarioService;
     
-    @GetMapping("/usuarios")
-    public List<Usuario> listAllUsuarios() {
-        return usuarioService.listAllUsuarios();
+        @GetMapping("/usuarios")
+    public ResponseEntity<Object> listAllUsuarios() {
+          return ResponseHandler.responseBuilder("Usuario Creado con exito", HttpStatus.OK, usuarioService.listAllUsuarios());  
+   
     }
     
-    @PostMapping("/usuarios")
-    public Usuario crearUsuario(@Valid @RequestBody Usuario usuario) {
+      @PostMapping("/usuarios")
+    public ResponseEntity<Object> crearUsuario(@Valid @RequestBody Usuario usuario) {
         System.out.println("Datos Recibidos: " + usuario);
-        return usuarioService.saveUsuario(usuario);    }
-    
-
-
-@PutMapping("/usuarios/{id}")
-public Usuario actualizarUsuario(@PathVariable Long id,@RequestBody Usuario usuarioRequest){
+        return ResponseHandler.responseBuilder("Usuario Creado con exito", HttpStatus.OK, usuarioService.saveUsuario(usuario));  
+    }
        
-    return usuarioService.actualizarUsuario(id, usuarioRequest);
-
+     @GetMapping("/usuarios/{id}")
+public ResponseEntity<Object> getUsuarioById(@PathVariable Long id) {
+    return ResponseHandler.responseBuilder("Datos del usuario solicitado", HttpStatus.OK, usuarioService.getUsuarioById(id));
 }
 
-@GetMapping("/usuarios/{id}")
-public Usuario getUsuarioById(@PathVariable Long id) {
-    return usuarioService.getUsuarioById(id);
+    @PutMapping("/usuarios/{id}")
+public ResponseEntity<Object> actualizarUsuario(@PathVariable Long id,@RequestBody Usuario usuarioRequest){
+    return ResponseHandler.responseBuilder("Datos del usuario actualizado", HttpStatus.OK, usuarioService.actualizarUsuario(id, usuarioRequest));
 }
 
-
-
-
-@DeleteMapping("/usuarios/{id}")
-void deleteUsuario(@PathVariable Long id){
-     usuarioService.deleteUsuario(id);
+    @DeleteMapping("/usuarios/{id}")
+ResponseEntity<Object> deleteUsuario(@PathVariable Long id){
+   
+     return ResponseHandler.responseBuilder("Datos del usuario eliminado", HttpStatus.OK, usuarioService.deleteUsuario(id));
 }
 
 

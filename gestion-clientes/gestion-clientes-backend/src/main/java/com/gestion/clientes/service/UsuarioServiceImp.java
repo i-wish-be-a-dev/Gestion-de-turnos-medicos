@@ -44,12 +44,12 @@ public class UsuarioServiceImp implements UsuarioService {
     }
 
     @Override
-    public void deleteUsuario(Long id) {
+    public Usuario deleteUsuario(Long id) {
       
           Usuario existente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado" + id));
           usuarioRepository.deleteById(id);
-       
+       return existente;
     }
 
     @Override
@@ -61,8 +61,8 @@ public class UsuarioServiceImp implements UsuarioService {
           existente.setNombre(usuarioRequest.getNombre());
           existente.setApellido(usuarioRequest.getApellido());
           existente.setEmail(usuarioRequest.getEmail());
-    Usuario usuarioActualizado = usuarioRepository.save(existente);
-    return usuarioActualizado;
+    return usuarioRepository.save(existente);
+   
     }
     
 }

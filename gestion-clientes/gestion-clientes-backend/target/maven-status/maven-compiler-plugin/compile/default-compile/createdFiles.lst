@@ -5,3 +5,4 @@ com\gestion\clientes\model\Usuario.class
 com\gestion\clientes\GestionClientesBackendApplication.class
 com\gestion\clientes\exception\ResourceNotFoundException.class
 com\gestion\clientes\service\UsuarioService.class
+com\gestion\clientes\response\ResponseHandler.class
