@@ -17,8 +17,6 @@ import lombok.NoArgsConstructor;
 
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "usuario")
 public class Usuario {
@@ -34,8 +32,27 @@ public class Usuario {
     private String apellido;
      @Column(name = "email")
     private String email;
+
+    public Usuario(String nombre, String apellido, String email) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.email = email;
+    }
+
+    public Usuario() {
+    }
+
+    public Usuario(long idUsuario, String nombre, String apellido, String email) {
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.email = email;
+    }
     
     
+     
+     
+     
         public long getIdUsuario() { return idUsuario; }
     public void setIdUsuario(long idUsuario) { this.idUsuario = idUsuario; }
 
