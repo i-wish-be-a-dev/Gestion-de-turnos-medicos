@@ -32,7 +32,7 @@ public class UsuarioServiceImp implements UsuarioService {
     public Usuario getUsuarioById(Long id) {
 
         Usuario existente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado" + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado " + id));
         return existente;
     
     }
