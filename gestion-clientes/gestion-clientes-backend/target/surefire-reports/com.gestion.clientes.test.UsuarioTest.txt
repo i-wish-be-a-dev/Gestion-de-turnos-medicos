@@ -1,4 +1,14 @@
 -------------------------------------------------------------------------------
 Test set: com.gestion.clientes.test.UsuarioTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.06 s -- in com.gestion.clientes.test.UsuarioTest
+Tests run: 8, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 17.77 s <<< FAILURE! -- in com.gestion.clientes.test.UsuarioTest
+com.gestion.clientes.test.UsuarioTest.testEliminarUsuario -- Time elapsed: 0.042 s <<< ERROR!
+com.gestion.clientes.exception.ResourceNotFoundException: Usuario no encontrado 702
+	at com.gestion.clientes.service.UsuarioServiceImp.lambda$getUsuarioById$0(UsuarioServiceImp.java:35)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.gestion.clientes.service.UsuarioServiceImp.getUsuarioById(UsuarioServiceImp.java:35)
+	at com.gestion.clientes.test.UsuarioTest.testEliminarUsuario(UsuarioTest.java:101)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+

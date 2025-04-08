@@ -9,18 +9,11 @@ import com.gestion.clientes.exception.ResourceNotFoundException;
 import com.gestion.clientes.model.Usuario;
 import com.gestion.clientes.service.UsuarioService;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
@@ -61,14 +54,12 @@ public class UsuarioTest {
             });
     }
     
-    
     @Test
     public void testActualizarUsuario(){
        String nombreNuevo = "Alberto";
         Usuario usuarioActualizado = new Usuario("Alberto", "Broder", "tomasb@mail.com");
       long id = 652;
-        
-     
+      
      Usuario usuarioGuardado =   usuarioService.getUsuarioById(id);
      assertNotNull(usuarioGuardado);
      usuarioGuardado.setNombre(usuarioActualizado.getNombre());
@@ -79,12 +70,7 @@ public class UsuarioTest {
      assertThat(usuarioGuardado.getNombre()).isEqualTo(usuarioActualizado.getNombre());
       assertThat(usuarioGuardado.getApellido()).isEqualTo(usuarioActualizado.getApellido());
        assertThat(usuarioGuardado.getEmail()).isEqualTo(usuarioActualizado.getEmail());
-     
-    
-    }
-    
-    
-      
+    }  
     @Test
     public void testActualizarUsuarioInexistente(){
   
@@ -112,14 +98,11 @@ public class UsuarioTest {
 public void testEliminarUsuario() {
     long id = 702;
 
-    // Verificamos que exista antes de eliminar
     Usuario usuarioAntes = usuarioService.getUsuarioById(id);
     assertNotNull(usuarioAntes);
 
-    // Eliminar el usuario
     usuarioService.deleteUsuario(id);
-
-    // Verificar que al intentar buscarlo lanza la excepción
+    
     assertThrows(ResourceNotFoundException.class, () -> {
         usuarioService.getUsuarioById(id);
     });
@@ -129,14 +112,12 @@ public void testEliminarUsuario() {
 public void testEliminarUsuarioInexistente() {
     long id = 702;
 
-
-
     assertThrows(ResourceNotFoundException.class, () -> {
          Usuario usuarioAntes = usuarioService.getUsuarioById(id);
     });
 }   
 
-
+// ctrl shift C
 
 
     
