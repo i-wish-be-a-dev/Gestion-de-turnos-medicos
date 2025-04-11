@@ -9,5 +9,7 @@ package com.gestion.clientes.model;
  * @author Tomi
  */
 public enum Rol {
+    ADMIN,
+    USER
     
 }

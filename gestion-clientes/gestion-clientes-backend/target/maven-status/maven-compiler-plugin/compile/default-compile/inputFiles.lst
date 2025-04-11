@@ -1,8 +1,16 @@
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\auth\AuthController.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\auth\AuthResponse.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\auth\AuthService.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\auth\LoginRequest.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\auth\RegisterRequest.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\config\ApplicationConfig.java
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\config\SecurityConfig.java
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\controller\UsuarioController.java
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\exception\ResourceNotFoundException.java
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\GestionClientesBackendApplication.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\Jwt\JwtAuthenticationFilter.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\Jwt\JwtService.java
+E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\model\Rol.java
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\model\Usuario.java
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\repository\UsuarioRepository.java
 E:\Proyectos\spring-react\gestion-clientes\gestion-clientes-backend\src\main\java\com\gestion\clientes\response\ResponseHandler.java
