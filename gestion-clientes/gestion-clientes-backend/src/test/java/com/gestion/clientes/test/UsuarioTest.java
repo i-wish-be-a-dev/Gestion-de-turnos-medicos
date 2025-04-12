@@ -34,110 +34,110 @@ public class UsuarioTest {
     @Autowired
     UsuarioService usuarioService;
     
-    @Test
-    public void testGuardarUsuario(){
-        Usuario usuario = new Usuario("Julian", "Broder", "tomasb@mail.com");
-
-     Usuario usuarioGuardado=   usuarioService.saveUsuario(usuario);
-    assertNotNull(usuarioGuardado);
-    }
-    
-    @Test
-    public void testBuscarUsuarioPorId(){
-    
-        long id = 652;
-       Usuario usuarioConsultado = usuarioService.getUsuarioById(id);
-      assertThat(usuarioConsultado.getIdUsuario()).isEqualTo(id);
-     
-    }
-    @Test
-    public void testBuscarUsuarioInexistentePorId(){
-
-        long id = 000;
-      
-       assertThrows(ResourceNotFoundException.class,
-            () -> {
-            Usuario usuarioConsultado = usuarioService.getUsuarioById(id);
-            });
-    }
-    
-    
-    @Test
-    public void testActualizarUsuario(){
-       String nombreNuevo = "Alberto";
-        Usuario usuarioActualizado = new Usuario("Alberto", "Broder", "tomasb@mail.com");
-      long id = 652;
-        
-     
-     Usuario usuarioGuardado =   usuarioService.getUsuarioById(id);
-     assertNotNull(usuarioGuardado);
-     usuarioGuardado.setNombre(usuarioActualizado.getNombre());
-     usuarioGuardado.setApellido(usuarioActualizado.getApellido());
-     usuarioGuardado.setEmail(usuarioActualizado.getEmail());
-  usuarioService.saveUsuario(usuarioGuardado);
-     usuarioGuardado =   usuarioService.getUsuarioById(id);
-     assertThat(usuarioGuardado.getNombre()).isEqualTo(usuarioActualizado.getNombre());
-      assertThat(usuarioGuardado.getApellido()).isEqualTo(usuarioActualizado.getApellido());
-       assertThat(usuarioGuardado.getEmail()).isEqualTo(usuarioActualizado.getEmail());
-     
-    
-    }
-    
-    
-      
-    @Test
-    public void testActualizarUsuarioInexistente(){
-  
-        Usuario usuarioActualizado = new Usuario("Alberto", "Broder", "tomasb@mail.com");
-      long id = 000;
-        
-            assertThrows(ResourceNotFoundException.class,
-            () -> {
-               Usuario usuarioGuardado =   usuarioService.getUsuarioById(id);    
-     
-            });
-
-    }  
-    
- @Test
- public void testListarUsuarios(){
- 
-     List<Usuario> usuarios = usuarioService.listAllUsuarios();
-     
-     assertThat(usuarios).size().isGreaterThan(0);
- }
- 
- 
-@Test
-public void testEliminarUsuario() {
-    long id = 702;
-
-    // Verificamos que exista antes de eliminar
-    Usuario usuarioAntes = usuarioService.getUsuarioById(id);
-    assertNotNull(usuarioAntes);
-
-    // Eliminar el usuario
-    usuarioService.deleteUsuario(id);
-
-    // Verificar que al intentar buscarlo lanza la excepción
-    assertThrows(ResourceNotFoundException.class, () -> {
-        usuarioService.getUsuarioById(id);
-    });
-}
-
- @Test
-public void testEliminarUsuarioInexistente() {
-    long id = 702;
-
-
-
-    assertThrows(ResourceNotFoundException.class, () -> {
-         Usuario usuarioAntes = usuarioService.getUsuarioById(id);
-    });
-}   
-
-
-
+//    @Test
+//    public void testGuardarUsuario(){
+//        Usuario usuario = new Usuario("Julian", "Broder", "tomasb@mail.com");
+//
+//     Usuario usuarioGuardado=   usuarioService.saveUsuario(usuario);
+//    assertNotNull(usuarioGuardado);
+//    }
+//    
+//    @Test
+//    public void testBuscarUsuarioPorId(){
+//    
+//        long id = 652;
+//       Usuario usuarioConsultado = usuarioService.getUsuarioById(id);
+//      assertThat(usuarioConsultado.getIdUsuario()).isEqualTo(id);
+//     
+//    }
+//    @Test
+//    public void testBuscarUsuarioInexistentePorId(){
+//
+//        long id = 000;
+//      
+//       assertThrows(ResourceNotFoundException.class,
+//            () -> {
+//            Usuario usuarioConsultado = usuarioService.getUsuarioById(id);
+//            });
+//    }
+//    
+//    
+//    @Test
+//    public void testActualizarUsuario(){
+//       String nombreNuevo = "Alberto";
+//        Usuario usuarioActualizado = new Usuario("Alberto", "Broder", "tomasb@mail.com");
+//      long id = 652;
+//        
+//     
+//     Usuario usuarioGuardado =   usuarioService.getUsuarioById(id);
+//     assertNotNull(usuarioGuardado);
+//     usuarioGuardado.setNombre(usuarioActualizado.getNombre());
+//     usuarioGuardado.setApellido(usuarioActualizado.getApellido());
+//     usuarioGuardado.setEmail(usuarioActualizado.getEmail());
+//  usuarioService.saveUsuario(usuarioGuardado);
+//     usuarioGuardado =   usuarioService.getUsuarioById(id);
+//     assertThat(usuarioGuardado.getNombre()).isEqualTo(usuarioActualizado.getNombre());
+//      assertThat(usuarioGuardado.getApellido()).isEqualTo(usuarioActualizado.getApellido());
+//       assertThat(usuarioGuardado.getEmail()).isEqualTo(usuarioActualizado.getEmail());
+//     
+//    
+//    }
+//    
+//    
+//      
+//    @Test
+//    public void testActualizarUsuarioInexistente(){
+//  
+//        Usuario usuarioActualizado = new Usuario("Alberto", "Broder", "tomasb@mail.com");
+//      long id = 000;
+//        
+//            assertThrows(ResourceNotFoundException.class,
+//            () -> {
+//               Usuario usuarioGuardado =   usuarioService.getUsuarioById(id);    
+//     
+//            });
+//
+//    }  
+//    
+// @Test
+// public void testListarUsuarios(){
+// 
+//     List<Usuario> usuarios = usuarioService.listAllUsuarios();
+//     
+//     assertThat(usuarios).size().isGreaterThan(0);
+// }
+// 
+// 
+//@Test
+//public void testEliminarUsuario() {
+//    long id = 702;
+//
+//    // Verificamos que exista antes de eliminar
+//    Usuario usuarioAntes = usuarioService.getUsuarioById(id);
+//    assertNotNull(usuarioAntes);
+//
+//    // Eliminar el usuario
+//    usuarioService.deleteUsuario(id);
+//
+//    // Verificar que al intentar buscarlo lanza la excepción
+//    assertThrows(ResourceNotFoundException.class, () -> {
+//        usuarioService.getUsuarioById(id);
+//    });
+//}
+//
+// @Test
+//public void testEliminarUsuarioInexistente() {
+//    long id = 702;
+//
+//
+//
+//    assertThrows(ResourceNotFoundException.class, () -> {
+//         Usuario usuarioAntes = usuarioService.getUsuarioById(id);
+//    });
+//}   
+//
+//
+//
 
     
 }

@@ -1,4 +1,3 @@
-com\gestion\clientes\service\UsuarioServiceImp.class
 com\gestion\clientes\repository\UsuarioRepository.class
 com\gestion\clientes\controller\UsuarioController.class
 com\gestion\clientes\model\Usuario.class
