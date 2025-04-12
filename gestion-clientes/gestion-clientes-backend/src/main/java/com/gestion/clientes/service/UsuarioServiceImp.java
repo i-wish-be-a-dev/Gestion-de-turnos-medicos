@@ -58,8 +58,9 @@ public class UsuarioServiceImp implements UsuarioService {
   Usuario existente = usuarioRepository.findById(id)
           .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado: "+id));
     
-          existente.setNombre(usuarioRequest.getNombre());
-          existente.setApellido(usuarioRequest.getApellido());
+       
+          existente.setName(usuarioRequest.getName());
+          existente.setLastname(usuarioRequest.getLastname());
           existente.setEmail(usuarioRequest.getEmail());
     return usuarioRepository.save(existente);
    
