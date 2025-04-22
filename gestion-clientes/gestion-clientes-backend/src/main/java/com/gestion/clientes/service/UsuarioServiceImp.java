@@ -56,7 +56,7 @@ public class UsuarioServiceImp implements UsuarioService {
     public Usuario actualizarUsuario(Long id, Usuario usuarioRequest) {
 
   Usuario existente = usuarioRepository.findById(id)
-          .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado: "+id));
+          .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: "+id));
     
        
           existente.setName(usuarioRequest.getName());
@@ -65,5 +65,15 @@ public class UsuarioServiceImp implements UsuarioService {
     return usuarioRepository.save(existente);
    
     }
+
+
     
+    public Usuario findByUsername(String username) {
+        return usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + username));
+    }
+	
+	
+	
 }
+

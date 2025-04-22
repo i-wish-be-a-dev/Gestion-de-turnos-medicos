@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+
 @Service
 public class JwtService {
 
-	
-	private static final String SECRET_KEY = "ASDADASMLDJASDASDAS4D5A4D23AS153151521D6WDE416AS1DASD51AS6D41ASD61AS6D1ASD6";
+	    @Value("${secret-key}")
+	    private String secretKey;
 	
 	
 	
@@ -43,7 +45,8 @@ public class JwtService {
 	}
 
 	private Key getKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+		System.out.println("Secret key: " + secretKey);
+		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 
