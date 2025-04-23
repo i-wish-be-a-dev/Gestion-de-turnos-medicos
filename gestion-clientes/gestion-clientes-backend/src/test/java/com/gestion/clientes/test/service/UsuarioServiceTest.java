@@ -112,7 +112,7 @@ public class UsuarioServiceTest {
    
         assertAll(() -> usuarioService.deleteUsuario(idUsuario));
     }
-	
+	@Test
 	public void UsuarioService_UpdateUsuario() {
 		
 		 long idUsuario = 1;
@@ -121,21 +121,68 @@ public class UsuarioServiceTest {
 	        Usuario usuario = Usuario.builder()
 	                .idUsuario(idUsuario)
 	                .username("Garfield")
-	                .password("...")
 	                .name("Tomas")
 	                .lastname("Broder")
 	                .email("tomasbroder2222@mail.com")
 	                .rol(Role.USER)
 	                .build();
 		 
-		 
-		 
+	        when(usuarioRepository.findById(idUsuario)).thenReturn(Optional.ofNullable(usuario));
+	    
+	        when(usuarioRepository.save(Mockito.any(Usuario.class))).thenReturn(usuario);
 		
+	    	Usuario usuarioReturn = usuarioService.actualizarUsuario(idUsuario, usuario);
+	    	
+	    	Assertions.assertThat(usuarioReturn).isNotNull();
+	    	
 	}
     
+    @Test
+    public void UsuarioService_FindById_ReturnUsuario() {
+		 long idUsuario = 1;
+		 
+		 
+	        Usuario usuario = Usuario.builder()
+	                .idUsuario(idUsuario)
+	                .username("Garfield")
+	                .name("Tomas")
+	                .lastname("Broder")
+	                .email("tomasbroder2222@mail.com")
+	                .rol(Role.USER)
+	                .build();
+		 
+	        when(usuarioRepository.findById(idUsuario)).thenReturn(Optional.ofNullable(usuario));
+	    
+	        
+	        Usuario usuarioReturn = usuarioService.getUsuarioById(idUsuario);
+	        
+	        Assertions.assertThat(usuarioReturn).isNotNull();
+	        
+    }
     
     
     
+    @Test
+    public void UsuarioService_FindByUsername_ReturnUsuario() {
+		 String username = "Garfield";
+		 
+		 
+	        Usuario usuario = Usuario.builder()
+	                .username(username)
+	                .name("Tomas")
+	                .lastname("Broder")
+	                .email("tomasbroder2222@mail.com")
+	                .rol(Role.USER)
+	                .build();
+		 
+	        when(usuarioRepository.findByUsername(username)).thenReturn(Optional.ofNullable(usuario));
+	    
+	        
+	        Usuario usuarioReturn = usuarioService.findByUsername(username);
+	        
+	        Assertions.assertThat(usuarioReturn).isNotNull();
+	        
+    }
 	
 	
 	
