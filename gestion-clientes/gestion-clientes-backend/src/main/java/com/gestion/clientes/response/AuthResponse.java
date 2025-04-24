@@ -1,4 +1,4 @@
-package com.gestion.clientes.auth;
+package com.gestion.clientes.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

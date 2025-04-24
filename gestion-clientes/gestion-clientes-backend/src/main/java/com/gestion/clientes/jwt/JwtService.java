@@ -1,10 +1,12 @@
 package com.gestion.clientes.jwt;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -12,19 +14,29 @@ import com.gestion.clientes.model.Usuario;
 
 import java.util.function.Function;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+
 @Service
 public class JwtService {
 
+	    @Value("${secret-key}")
+	    private String secretKey;
 	
-	private static final String SECRET_KEY = "ASDADASMLDJASDASDAS4D5A4D23AS153151521D6WDE416AS1DASD51AS6D41ASD61AS6D1ASD6";
 	
 	
-	
+	public String getSecretKey() {
+			return secretKey;
+		}
+
+		public void setSecretKey(String secretKey) {
+			this.secretKey = secretKey;
+		}
+
 	public String getToken(UserDetails user) {
 		
 		return getToken(new HashMap<>(),user);
@@ -43,7 +55,7 @@ public class JwtService {
 	}
 
 	private Key getKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+		byte[] keyBytes = Decoders.BASE64.decode(this.getSecretKey());
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 
@@ -53,8 +65,12 @@ public class JwtService {
 	}
 
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String username = getUsernameFromToken(token);
-		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	    try {
+	        final String username = getUsernameFromToken(token);
+	        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	    } catch (ExpiredJwtException e) {
+	        return false;
+	    }
 	}
 
     private Claims getAllClaims(String token)
@@ -81,7 +97,10 @@ public class JwtService {
 
     private boolean isTokenExpired(String token)
     {
-        return getExpiration(token).before(new Date());
+
+    return getExpiration(token).before(new Date());
+    	
+
     }
     
 

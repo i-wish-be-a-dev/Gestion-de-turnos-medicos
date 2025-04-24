@@ -25,6 +25,10 @@ public interface UsuarioService {
     Usuario saveUsuario(Usuario usuario);
 
     Usuario deleteUsuario(Long id);
+    
+    Usuario findByUsername(String username); 
+
+    
 
     
 }

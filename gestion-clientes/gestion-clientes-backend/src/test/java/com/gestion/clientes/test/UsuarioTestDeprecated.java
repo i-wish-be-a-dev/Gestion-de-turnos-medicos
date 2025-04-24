@@ -28,8 +28,10 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Tomi
  */
 
+
+
 @SpringBootTest
-public class UsuarioTest {
+public class UsuarioTestDeprecated {
     
     @Autowired
     UsuarioService usuarioService;

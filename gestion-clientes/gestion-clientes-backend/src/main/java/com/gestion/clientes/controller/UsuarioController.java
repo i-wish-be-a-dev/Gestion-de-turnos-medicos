@@ -39,11 +39,11 @@ public class UsuarioController {
    
     }
     
-      @PostMapping("/usuarios")
-    public ResponseEntity<Object> crearUsuario(@Valid @RequestBody Usuario usuario) {
-        System.out.println("Datos Recibidos: " + usuario);
-        return ResponseHandler.responseBuilder("Usuario Creado con exito", HttpStatus.OK, usuarioService.saveUsuario(usuario));  
-    }
+//      @PostMapping("/usuarios")
+//    public ResponseEntity<Object> crearUsuario(@Valid @RequestBody Usuario usuario) {
+//        System.out.println("Datos Recibidos: " + usuario);
+//        return ResponseHandler.responseBuilder("Usuario Creado con exito", HttpStatus.OK, usuarioService.saveUsuario(usuario));  
+//    }
        
      @GetMapping("/usuarios/{id}")
 public ResponseEntity<Object> getUsuarioById(@PathVariable Long id) {
