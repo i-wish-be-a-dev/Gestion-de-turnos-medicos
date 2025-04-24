@@ -1,24 +1,16 @@
-package com.gestion.clientes.test.service;
+package com.gestion.clientes.test;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+
 import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.gestion.clientes.model.Role;
 import com.gestion.clientes.model.Usuario;

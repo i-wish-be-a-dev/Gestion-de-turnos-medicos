@@ -14,6 +14,7 @@ import com.gestion.clientes.model.Usuario;
 
 import java.util.function.Function;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -28,6 +29,14 @@ public class JwtService {
 	
 	
 	
+	public String getSecretKey() {
+			return secretKey;
+		}
+
+		public void setSecretKey(String secretKey) {
+			this.secretKey = secretKey;
+		}
+
 	public String getToken(UserDetails user) {
 		
 		return getToken(new HashMap<>(),user);
@@ -46,7 +55,7 @@ public class JwtService {
 	}
 
 	private Key getKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+		byte[] keyBytes = Decoders.BASE64.decode(this.getSecretKey());
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 
@@ -56,8 +65,12 @@ public class JwtService {
 	}
 
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String username = getUsernameFromToken(token);
-		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	    try {
+	        final String username = getUsernameFromToken(token);
+	        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	    } catch (ExpiredJwtException e) {
+	        return false;
+	    }
 	}
 
     private Claims getAllClaims(String token)
@@ -84,7 +97,10 @@ public class JwtService {
 
     private boolean isTokenExpired(String token)
     {
-        return getExpiration(token).before(new Date());
+
+    return getExpiration(token).before(new Date());
+    	
+
     }
     
 

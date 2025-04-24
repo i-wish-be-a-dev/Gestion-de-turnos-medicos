@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 
 @SpringBootTest
-public class UsuarioTest {
+public class UsuarioTestDeprecated {
     
     @Autowired
     UsuarioService usuarioService;
