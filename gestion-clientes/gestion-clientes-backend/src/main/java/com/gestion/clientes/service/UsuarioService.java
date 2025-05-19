@@ -28,7 +28,10 @@ public interface UsuarioService {
     
     Usuario findByUsername(String username); 
 
-    
+    Usuario changeRoleToPaciente(Long id);
 
+    Usuario changeRoleToDoctor(Long id);
+    
+    Usuario changeRoleToAdmin(Long id);
     
 }

@@ -2,6 +2,9 @@ package com.gestion.clientes.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,13 +28,19 @@ public class Turno {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Argentina/Buenos_Aires")
 	private Date fechaTurno;
 	
 	@ManyToOne
 	@JoinColumn(name = "idPaciente")
-	private Paciente paciente;
+	private Usuario paciente;
 	
 	@ManyToOne
 	@JoinColumn(name = "idMedico")
-	private Medico medico;
+	private Usuario medico;
+	
+	@Column(name = "turnoEstate")
+	private TurnoState turnoState;
+	
 }

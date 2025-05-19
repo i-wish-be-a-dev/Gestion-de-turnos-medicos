@@ -11,12 +11,12 @@ import com.gestion.clientes.model.Usuario;
 
 @Service
 public interface TurnoService {
-
-	List<Turno> findByMedicoIdMedico(Long idMedico);
-	
-	List<Turno> findByPacienteIdPaciente(Long idPaciente);
 	
 	List<Turno> listAllTurnos();
+	
+	List<Turno> listTurnosVigentes();
+
+	List<Turno> listTurnosCancelados();
 	
 	Turno getTurnoById(Long id);
 	
@@ -25,4 +25,12 @@ public interface TurnoService {
 	Turno deleteTurno(Long id);
 	
 	Turno updateTurno(Long id, Turno turno);
+	
+	List <Turno> listTurnosByDoctor(Long id);
+	
+	List <Turno> listTurnosCanceladosByDoctor(Long id);
+	
+	List <Turno> listTurnosByPaciente(Long id);
+	
+	Turno eliminarTurnoComoUsuario(Long id);
 }
