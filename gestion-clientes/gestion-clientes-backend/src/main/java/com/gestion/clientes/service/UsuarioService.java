@@ -5,17 +5,12 @@
 package com.gestion.clientes.service;
 
 import com.gestion.clientes.model.Usuario;
-import com.gestion.clientes.repository.UsuarioRepository;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface UsuarioService {
 
-    
-    
     List<Usuario> listAllUsuarios();
 
     Usuario getUsuarioById(Long id);

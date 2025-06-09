@@ -28,4 +28,23 @@ public class ResponseHandler {
         return new ResponseEntity<>(response, httpStatus);
     
     }
+
+
+    public static ResponseEntity<Object> responseTurnoBuilder(
+    String message, HttpStatus httpStatus, Object responseObject){
+    
+        String utcIso = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
+        Map<String,Object> response = new HashMap<>();
+        response.put("message", message);
+        response.put("httpStatus", httpStatus);
+        response.put("data", responseObject);
+        response.put("timestamp", utcIso);
+        return new ResponseEntity<>(response, httpStatus);
+    
+    }
+
+
+
+
+
 }

@@ -4,15 +4,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.gestion.clientes.model.Medico;
-import com.gestion.clientes.model.Paciente;
+import com.gestion.clientes.dto.TurnoResponseDto;
 import com.gestion.clientes.model.Turno;
-import com.gestion.clientes.model.Usuario;
 
 @Service
 public interface TurnoService {
 	
-	List<Turno> listAllTurnos();
+	List<TurnoResponseDto> listAllTurnos();
 	
 	List<Turno> listTurnosVigentes();
 
@@ -20,7 +18,7 @@ public interface TurnoService {
 	
 	Turno getTurnoById(Long id);
 	
-	Turno asignarTurno(Long idPaciente, Long idMedico, Turno data);
+	TurnoResponseDto asignarTurno(Long idPaciente, Long idMedico, Turno data);
 	
 	Turno deleteTurno(Long id);
 	

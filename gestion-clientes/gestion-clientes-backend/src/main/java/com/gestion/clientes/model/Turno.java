@@ -1,11 +1,14 @@
 package com.gestion.clientes.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,17 +33,20 @@ public class Turno {
 	private Long id;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "America/Argentina/Buenos_Aires")
-	private Date fechaTurno;
+	private LocalDateTime  fechaTurno;
 	
 	@ManyToOne
 	@JoinColumn(name = "idPaciente")
+	@JsonIgnoreProperties("turnos")
 	private Usuario paciente;
 	
 	@ManyToOne
 	@JoinColumn(name = "idMedico")
+	@JsonIgnoreProperties("turnos")
 	private Usuario medico;
 	
-	@Column(name = "turnoEstate")
+	@Enumerated(EnumType.STRING)
+	@Column(name = "turnoState ")
 	private TurnoState turnoState;
 	
 }

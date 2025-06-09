@@ -5,7 +5,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
+
+import com.gestion.clientes.dto.TurnoResponseDto;
+import com.gestion.clientes.dto.UsuarioSimpleDto;
 import com.gestion.clientes.exception.ResourceNotFoundException;
 import com.gestion.clientes.exception.RoleNotFitForThisTask;
 import com.gestion.clientes.model.Role;
@@ -16,7 +25,7 @@ import com.gestion.clientes.repository.TurnoRepository;
 import com.gestion.clientes.repository.UsuarioRepository;
 
 
-
+@Service
 public class TurnoServiceImp implements TurnoService {
 
 	@Autowired
@@ -25,9 +34,27 @@ public class TurnoServiceImp implements TurnoService {
 	private UsuarioRepository usuarioRepository;
 
 	@Override
-	public List<Turno> listAllTurnos() {
+	public List<TurnoResponseDto> listAllTurnos() {
 
-		return (List<Turno>) turnoRepository.findAll();
+		List<Turno> turnos = turnoRepository.findAll();
+
+	return	turnos.stream()
+		.map(
+				turno -> TurnoResponseDto.builder()
+				.id(turno.getId())
+				.fechaTurno(turno.getFechaTurno())
+				.turnoState(turno.getTurnoState())
+				.paciente(UsuarioSimpleDto.builder()
+						.idUsuario(turno.getPaciente().getIdUsuario())
+						.username(turno.getPaciente().getUsername())
+						.build())
+				.medico(UsuarioSimpleDto.builder()
+						.idUsuario(turno.getMedico().getIdUsuario())
+						.username(turno.getMedico().getUsername())
+						.build())
+				.build()
+				).toList();
+		
 	}
 
 	@Override
@@ -40,7 +67,7 @@ public class TurnoServiceImp implements TurnoService {
 	}
 
 	@Override
-	public Turno asignarTurno(Long idPaciente, Long idMedico, Turno data) {
+	public TurnoResponseDto asignarTurno(Long idPaciente, Long idMedico, Turno data) {
 	
 		Usuario medico = usuarioRepository.findById(idMedico)
 				.orElseThrow(
@@ -60,7 +87,21 @@ public class TurnoServiceImp implements TurnoService {
 						.fechaTurno(data.getFechaTurno())
 						.turnoState(TurnoState.VIGENTE)
 						.build();
-				return turnoRepository.save(turno);
+				  Turno savedTurno = turnoRepository.save(turno);
+				  
+				    return TurnoResponseDto.builder()
+				            .id(savedTurno.getId())
+				            .fechaTurno(savedTurno.getFechaTurno())
+				            .turnoState(savedTurno.getTurnoState())
+				            .paciente(UsuarioSimpleDto.builder()
+				                .idUsuario(paciente.getIdUsuario())
+				                .username(paciente.getUsername())
+				                .build())
+				            .medico(UsuarioSimpleDto.builder()
+				                .idUsuario(medico.getIdUsuario())
+				                .username(medico.getUsername())
+				                .build())
+				            .build();
 			}
 			else {
 
@@ -133,47 +174,52 @@ throw new RoleNotFitForThisTask("El usuario con id "+ id + " no es un paciente")
 
 	@Override
 	public Turno eliminarTurnoComoUsuario(Long id) {
-//		Usuario usuario = usuarioRepository.findById(id)
-//				.orElseThrow(
-//						() ->  new ResourceNotFoundException("Paciente no encontrado"));
+
 		
 	Turno turno = turnoRepository.findById(id)
 			.orElseThrow(
 					() -> new ResourceNotFoundException("Turno no encontrado"));
 		
-		Date now = new Date();
-		long horasDiferencia = (turno.getFechaTurno().getTime() - now.getTime()) / (1000 * 60 * 60);
+    LocalDateTime ahora = LocalDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires"));
 
-		if(horasDiferencia < 48) {
-			
-			throw new RoleNotFitForThisTask("El usuario con id "+ id + " es un paciente y ya no puede cancelar la cita");
-		}
-		turnoRepository.delete(turno);
-		return turno;
+
+
+		
+		  if (Duration.between(ahora, turno.getFechaTurno()).toHours() < 48) {
+			  throw new RoleNotFitForThisTask("El usuario con id "+ id + " es un paciente y ya no puede cancelar la cita");
+		    }
+
+		  turno.setTurnoState(TurnoState.ELIMINADO);
+		  return  turnoRepository.save(turno);
 	}
 
 	@Override
 	public List<Turno> listTurnosVigentes() {
 	
-		return (List<Turno>) turnoRepository.ListByTurnoState(TurnoState.VIGENTE);
+		return (List<Turno>) turnoRepository.findByTurnoState(TurnoState.VIGENTE);
 	}
 
 	@Override
 	public List<Turno> listTurnosCancelados() {
 		
-		return (List<Turno>) turnoRepository.ListByTurnoState(TurnoState.ELIMINADO);
+		return (List<Turno>) turnoRepository.findByTurnoState(TurnoState.ELIMINADO);
 	}
 
 	@Override
 	public List<Turno> listTurnosCanceladosByDoctor(Long id) {
 		
-		return (List<Turno>) turnoRepository.findByIdUsuarioAndTurnoState(id, TurnoState.ELIMINADO)
+		return (List<Turno>) turnoRepository.findByMedicoIdAndTurnoState(id, TurnoState.ELIMINADO)
 				.stream()
 				.filter(t -> t.getTurnoState().equals(TurnoState.ELIMINADO))
 				.collect(Collectors.toList());
 				
 	}
 
+	
+	
+	
+	
+	
 	
 	
 }
