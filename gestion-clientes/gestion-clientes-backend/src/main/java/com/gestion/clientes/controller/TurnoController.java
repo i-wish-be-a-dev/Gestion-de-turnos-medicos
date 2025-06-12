@@ -31,49 +31,52 @@ public class TurnoController {
 	
 	@PutMapping ({"/admin/eliminar-turno/{id}","doctor/eliminar-turno/{id}"})
 	public ResponseEntity<Object> eliminarTurno(@PathVariable Long id){
-		return ResponseHandler.responseBuilder("Turno eliminado", HttpStatus.CREATED, turnoService.deleteTurno(id));
+		return ResponseHandler.responseBuilder("Turno eliminado", HttpStatus.NO_CONTENT, turnoService.deleteTurno(id));
 	}
 	
 	
 	@PutMapping ("/paciente/eliminar-turno/{id}")
 	public ResponseEntity<Object> eliminarTurnoComoPaciente(@PathVariable Long id){
-		return ResponseHandler.responseBuilder("Turno eliminado", HttpStatus.CREATED, turnoService.eliminarTurnoComoUsuario(id));
+		return ResponseHandler.responseBuilder("Turno eliminado", HttpStatus.NO_CONTENT, turnoService.eliminarTurnoComoUsuario(id));
 	}
 	
 	
 	@GetMapping("/admin/turnos")
 	public ResponseEntity<Object> listarTodosLosTurnos(){
-		return ResponseHandler.responseBuilder("Listado de turnos", HttpStatus.CREATED, turnoService.listAllTurnos());
+		return ResponseHandler.responseBuilder("Listado de turnos", HttpStatus.OK, turnoService.listAllTurnos());
 	}
 	
 	@GetMapping("/admin/turnos-cancelados")
 	public ResponseEntity<Object> listarTodosLosTurnosCancelados(){
-		return ResponseHandler.responseBuilder("Listado de turnos cancelados", HttpStatus.CREATED, turnoService.listTurnosCancelados());
+		return ResponseHandler.responseBuilder("Listado de turnos cancelados", HttpStatus.OK, turnoService.listTurnosCancelados());
 	}
 	
 	
 	@GetMapping("/admin/turnos-vigentes")
 	public ResponseEntity<Object> listarTodosLosTurnosVigentes(){
-		return ResponseHandler.responseBuilder("Listado de turnos vigentes", HttpStatus.CREATED, turnoService.listTurnosVigentes());
+		return ResponseHandler.responseBuilder("Listado de turnos vigentes", HttpStatus.OK, turnoService.listTurnosVigentes());
 	}
 	
 	
-	@GetMapping("/admin/turnos-vigentes/{id}")
-	public ResponseEntity<Object> getTurnoById(){
-		return ResponseHandler.responseBuilder("Turno obtenido por id", HttpStatus.CREATED, turnoService.listTurnosVigentes());
+	@GetMapping("/admin/turno/{id}")
+	public ResponseEntity<Object> getTurnoById(@PathVariable Long id){
+		return ResponseHandler.responseBuilder("Turno obtenido por id", HttpStatus.OK, turnoService.getTurnoById(id));
 	}
 	
 	@GetMapping("/doctor/turnos-cancelados/{id}")
 	public ResponseEntity<Object> listarTodosLosTurnosCanceladosByDoctor(@PathVariable Long id){
-		return ResponseHandler.responseBuilder("Listado de turnos cancelados", HttpStatus.CREATED, turnoService.listTurnosCanceladosByDoctor(null));
+		return ResponseHandler.responseBuilder("Listado de turnos cancelados", HttpStatus.OK, turnoService.listTurnosCanceladosByDoctor(null));
 	}
 	
 	@GetMapping("/paciente/turnos-cancelados")
 	public ResponseEntity<Object> listarTodosLosTurnosByPaciente(){
-		return ResponseHandler.responseBuilder("Listado de turnos", HttpStatus.CREATED, turnoService.listAllTurnos());
+		return ResponseHandler.responseBuilder("Listado de turnos", HttpStatus.OK, turnoService.listAllTurnos());
 	}
 
-	
+	@PutMapping ("/doctor/eliminar-turno/{id}")
+	public ResponseEntity<Object> eliminarTurnoComoDoctor(@PathVariable Long id){
+		return ResponseHandler.responseBuilder("Turno eliminado", HttpStatus.OK, turnoService.eliminarTurnoComoDoctor(id));
+	}
 	
 	
 	

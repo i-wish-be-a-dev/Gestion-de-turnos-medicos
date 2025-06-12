@@ -4,4 +4,6 @@ public enum TurnoState {
 
 	VIGENTE,
 	ELIMINADO,
+	FINALIZADO,
+	PENDIENTE
 }

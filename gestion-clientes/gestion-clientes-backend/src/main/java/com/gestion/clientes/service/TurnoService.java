@@ -16,7 +16,7 @@ public interface TurnoService {
 
 	List<Turno> listTurnosCancelados();
 	
-	Turno getTurnoById(Long id);
+	TurnoResponseDto getTurnoById(Long id);
 	
 	TurnoResponseDto asignarTurno(Long idPaciente, Long idMedico, Turno data);
 	
@@ -31,4 +31,11 @@ public interface TurnoService {
 	List <Turno> listTurnosByPaciente(Long id);
 	
 	Turno eliminarTurnoComoUsuario(Long id);
+	
+	TurnoResponseDto finalizarTurno(Long id);
+	
+	TurnoResponseDto eliminarTurnoComoDoctor(Long id);
+
+	
+	
 }

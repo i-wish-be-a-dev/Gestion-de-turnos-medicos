@@ -1,5 +1,6 @@
 package com.gestion.clientes.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,28 @@ public interface TurnoRepository extends JpaRepository<Turno,Long> {
 	List<Turno> findByMedicoIdAndTurnoState(@Param("usuarioId") Long usuarioId, @Param("estado") TurnoState estado);
 
 	
-}
+	@Query("""
+		    SELECT t FROM Turno t 
+		    WHERE t.medico.idUsuario = :idMedico 
+		    AND t.fechaTurno < :fin 
+		    AND t.fechaTurno >= :inicio
+		""")
+	List<Turno> findTurnosSuperpuestosByMedico(@Param("idMedico") Long idMedico,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
+	
+	
+	
+
+	@Query("""
+		    SELECT t FROM Turno t 
+		    WHERE t.paciente.idUsuario = :idPaciente 
+		    AND t.fechaTurno < :fin 
+		    AND t.fechaTurno >= :inicio
+		""")
+	List<Turno> findTurnosSuperpuestosByPaciente(@Param("idPaciente") Long idPaciente,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
+	
+	}
+	

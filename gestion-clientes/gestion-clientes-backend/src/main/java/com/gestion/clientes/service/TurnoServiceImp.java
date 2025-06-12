@@ -58,12 +58,27 @@ public class TurnoServiceImp implements TurnoService {
 	}
 
 	@Override
-	public Turno getTurnoById(Long id) {
+	public TurnoResponseDto getTurnoById(Long id) {
 		
-		return turnoRepository.findById(id)
+		Turno turno =  turnoRepository.findById(id)
 				.orElseThrow(
 						() -> new ResourceNotFoundException("Turno no encontrado"));
 
+	    return TurnoResponseDto.builder()
+	            .id(turno.getId())
+	            .fechaTurno(turno.getFechaTurno())
+	            .turnoState(turno.getTurnoState())
+	            .paciente(UsuarioSimpleDto.builder()
+	                .idUsuario(turno.getPaciente().getIdUsuario())
+	                .username(turno.getPaciente().getUsername())
+	                .build())
+	            .medico(UsuarioSimpleDto.builder()
+	                .idUsuario(turno.getMedico().getIdUsuario())
+	                .username(turno.getMedico().getUsername())
+	                .build())
+	            .build();
+		 
+		
 	}
 
 	@Override
@@ -80,28 +95,42 @@ public class TurnoServiceImp implements TurnoService {
 							() -> new ResourceNotFoundException("Paciente no encontrado"));
 			
 			if(paciente.getRol().equals(Role.PACIENTE)) {
-				Turno turno = 
-						Turno.builder()
-						.medico(medico)
-						.paciente(paciente)
-						.fechaTurno(data.getFechaTurno())
-						.turnoState(TurnoState.VIGENTE)
-						.build();
-				  Turno savedTurno = turnoRepository.save(turno);
-				  
-				    return TurnoResponseDto.builder()
-				            .id(savedTurno.getId())
-				            .fechaTurno(savedTurno.getFechaTurno())
-				            .turnoState(savedTurno.getTurnoState())
-				            .paciente(UsuarioSimpleDto.builder()
-				                .idUsuario(paciente.getIdUsuario())
-				                .username(paciente.getUsername())
-				                .build())
-				            .medico(UsuarioSimpleDto.builder()
-				                .idUsuario(medico.getIdUsuario())
-				                .username(medico.getUsername())
-				                .build())
-				            .build();
+			
+				LocalDateTime inicio = data.getFechaTurno();
+				LocalDateTime fin = inicio.plusMinutes(30);
+				
+				List <Turno> conflictosByMedico= turnoRepository.findTurnosSuperpuestosByMedico(idMedico, inicio, fin);
+				List <Turno> conflictosByPaciente= turnoRepository.findTurnosSuperpuestosByPaciente(idPaciente, inicio, fin);
+				
+				if(conflictosByMedico.isEmpty() && conflictosByPaciente.isEmpty() ) {
+					Turno turno = 
+							Turno.builder()
+							.medico(medico)
+							.paciente(paciente)
+							.fechaTurno(data.getFechaTurno())
+							.turnoState(TurnoState.VIGENTE)
+							.build();
+					  Turno savedTurno = turnoRepository.save(turno);
+					  
+					    return TurnoResponseDto.builder()
+					            .id(savedTurno.getId())
+					            .fechaTurno(savedTurno.getFechaTurno())
+					            .turnoState(savedTurno.getTurnoState())
+					            .paciente(UsuarioSimpleDto.builder()
+					                .idUsuario(paciente.getIdUsuario())
+					                .username(paciente.getUsername())
+					                .build())
+					            .medico(UsuarioSimpleDto.builder()
+					                .idUsuario(medico.getIdUsuario())
+					                .username(medico.getUsername())
+					                .build())
+					            .build();
+					
+				}
+				
+				
+				
+			
 			}
 			else {
 
@@ -213,6 +242,40 @@ throw new RoleNotFitForThisTask("El usuario con id "+ id + " no es un paciente")
 				.filter(t -> t.getTurnoState().equals(TurnoState.ELIMINADO))
 				.collect(Collectors.toList());
 				
+	}
+
+	@Override
+	public TurnoResponseDto finalizarTurno(Long id) {
+		Turno turno = turnoRepository.findById(id)
+				.orElseThrow(
+						() -> new ResourceNotFoundException("Turno inexistente"));
+		turno.setTurnoState(TurnoState.FINALIZADO);
+		
+	    return TurnoResponseDto.builder()
+	            .id(turno.getId())
+	            .fechaTurno(turno.getFechaTurno())
+	            .turnoState(turno.getTurnoState())
+	            .paciente(UsuarioSimpleDto.builder()
+	                .idUsuario(turno.getPaciente().getIdUsuario())
+	                .username(turno.getPaciente().getUsername())
+	                .build())
+	            .medico(UsuarioSimpleDto.builder()
+	                .idUsuario(turno.getMedico().getIdUsuario())
+	                .username(turno.getMedico().getUsername())
+	                .build())
+	            .build();
+	}
+
+	@Override
+	public TurnoResponseDto eliminarTurnoComoDoctor(Long id) {
+
+		Turno turno = turnoRepository.findById(id)
+				.orElseThrow(
+						() -> new ResourceNotFoundException("Turno inexistente"));
+		
+		
+		
+		return null;
 	}
 
 	
