@@ -14,7 +14,7 @@ A futuro pretendo agregar un frontend con React.
    - Usuario gestiona sus turnos con diferentes especialistas  
    - Médico gestiona sus turnos  
    - Administrador gestiona todos los turnos  
-6. **Frontend** y diferentes vistas por rol  
+6. **Frontend** y diferentes vistas por rol   <---- Usted esta aqui
 7. Documentación final y testing de todo lo realizado  
 
 ---
