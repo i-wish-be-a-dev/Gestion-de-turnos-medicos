@@ -9,10 +9,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.gestion.clientes.jwt.JwtAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.Arrays;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +35,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		
 		return http
+				.cors(withDefaults())
 				.csrf(
 						csrf -> csrf.disable())
 				.authorizeHttpRequests(authRequest ->
@@ -49,7 +55,17 @@ public class SecurityConfig {
 		
 	}
 	
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
 	
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+		corsConfiguration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource ();
+		source.registerCorsConfiguration("/**", corsConfiguration);
+		return source;
+	}
 	
 
 }

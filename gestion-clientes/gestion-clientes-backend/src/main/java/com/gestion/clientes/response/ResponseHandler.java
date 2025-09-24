@@ -24,6 +24,7 @@ public class ResponseHandler {
         response.put("message", message);
         response.put("httpStatus", httpStatus);
         response.put("data", responseObject);
+     //   response.put("role", responseObject);
         response.put("timestamp", utcIso);
         return new ResponseEntity<>(response, httpStatus);
     
