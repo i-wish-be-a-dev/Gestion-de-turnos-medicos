@@ -8,8 +8,9 @@ import TurnoForm from './Components/TurnoForm'
 import Login from './Components/Login';
 
 
+
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 
   return (
     <BrowserRouter>
@@ -19,6 +20,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/turno/nuevo" element={<TurnoForm />} />
           <Route path="/turno/:id/edit" element={<TurnoForm />} />
+          <Route path="/turnos" element={<TurnosList />} />
         </Routes>
       </div>
     </BrowserRouter>

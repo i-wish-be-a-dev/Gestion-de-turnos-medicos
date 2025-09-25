@@ -1,15 +1,17 @@
 import { useState } from "react";
 
 import '../Styles/LoginForm.css';
-
-
+import { useNavigate } from "react-router-dom";
+import TurnosList from './TurnoList';
 
 export default function Login({}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
-    const handleSubmit = async (e) => {
+      const navigate = useNavigate();
+   
+      const handleSubmit = async (e) => {
         e.preventDefault();
+   
         try {
             const response = await fetch("http://localhost:8090/auth/login", {
                 method: "POST",
@@ -18,15 +20,18 @@ export default function Login({}) {
             });
             if (!response.ok) {
                 throw new Error("Login failed");
-            }
+               }
 
             const data = await response.json();
-            console.log("Login response:", data); // Debug log
-            localStorage.setItem("token", data.body?.token || data.token || "");
-            localStorage.setItem("role", data.body?.role || data.role || "");
-            console.log("Login successful token and role stored.");
-            // setIsLoggedIn(true); // Notify parent component about login status
-        } catch (error) {
+            // Extract token and role from the response
+         const token = data.data.body.token;
+         const role = data.data.body.role;
+
+            localStorage.setItem("token", token);
+            localStorage.setItem("role", role);
+
+            navigate("/turnos");
+         } catch (error) {
             console.error("Error during login:", error);
         }
     };

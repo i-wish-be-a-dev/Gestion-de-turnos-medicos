@@ -1,15 +1,54 @@
 import React, { useState, useEffect } from 'react';
 
+
 const TurnosList = () => {
     const [turnos, setTurnos] = useState([]);
+    const role = localStorage.getItem("role");
+    const token = localStorage.getItem("token");
+    // const    
 
+    console.log("Role:", role);
+    console.log("Token:", token);
     useEffect(() => {
         const fetchTurnos = async () => {
             try {
-                const res = await fetch("http://localhost:8080/api/turnos");
+                let url;
+
+
+                if (role === "ADMIN") {
+                    url = "http://localhost:8090/admin/turnos";
+                } else if (role === "MEDICO") {
+                    url = "http://localhost:8090/medico/turnos";
+                } else {
+                    url = "http://localhost:8090/paciente/turnos";
+                }
+                const res = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Er2ror HTTP: ${res.status}`);
+                }
+
+   
+
+         console.log('Token:', token);
+         console.log('Role:', role);
+
+         // Optional: Save them to localStorage or state
+         localStorage.setItem('authToken', token);
+         localStorage.setItem('userRole', role);
+
+
+
+
+
                 const data = await res.json();
-                setTurnos(data);
-                console.log(data);
+                setTurnos(data.data || []);
+                console.log("Turnos:", data);
 
 
             } catch (error) {
@@ -17,7 +56,7 @@ const TurnosList = () => {
             }
         };
         fetchTurnos();
-    }, []);
+    }, [role, token]);
 
     return (
         <div>
