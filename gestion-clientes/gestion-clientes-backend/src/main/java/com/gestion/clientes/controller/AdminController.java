@@ -29,17 +29,17 @@ public class AdminController {
 
         @GetMapping("/usuarios")
     public ResponseEntity<Object> listAllUsuarios() {
-          return ResponseHandler.responseBuilder("Usuario Creado con exito", HttpStatus.OK, usuarioService.listAllUsuarios());  
+          return ResponseHandler.responseBuilder("Listado de usuarios: ", HttpStatus.OK, usuarioService.listAllUsuarios());  
    
     }
     @GetMapping("/doctores")
     public ResponseEntity<Object> listAllDoctores() {
-          return ResponseHandler.responseBuilder("Usuario Creado con exito", HttpStatus.OK, usuarioService.listAllDoctores());  
+          return ResponseHandler.responseBuilder("Listado de doctores: ", HttpStatus.OK, usuarioService.listAllDoctores());  
    
     }
     @GetMapping("/pacientes")
     public ResponseEntity<Object> listAllPacientes() {
-          return ResponseHandler.responseBuilder("Usuario Creado con exito", HttpStatus.OK, usuarioService.listAllPacientes());  
+          return ResponseHandler.responseBuilder("Listado de pacientes: ", HttpStatus.OK, usuarioService.listAllPacientes());  
    
     }
     
