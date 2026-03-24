@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UsuarioService {
 
+    List<Usuario> listAllDoctores();
+
+    List<Usuario> listAllPacientes();
+
     List<Usuario> listAllUsuarios();
 
     Usuario getUsuarioById(Long id);

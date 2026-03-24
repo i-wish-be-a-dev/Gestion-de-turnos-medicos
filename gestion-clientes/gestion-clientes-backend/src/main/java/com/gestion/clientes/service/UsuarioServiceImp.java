@@ -103,6 +103,19 @@ public class UsuarioServiceImp implements UsuarioService {
 		 return usuarioRepository.save(existente);
 	}
 
+    @Override
+    public List<Usuario> listAllDoctores() {
+        
+    return usuarioRepository.findAll().stream().filter(usuario -> usuario.getRol() == Role.DOCTOR).toList();
+        
+        }
+
+    @Override
+    public List<Usuario> listAllPacientes() {
+ 
+    return usuarioRepository.findAll().stream().filter(usuario -> usuario.getRol() == Role.PACIENTE).toList();
+    }
+
 
 	
 	

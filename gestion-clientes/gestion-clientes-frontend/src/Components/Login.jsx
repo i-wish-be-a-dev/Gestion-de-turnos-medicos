@@ -3,6 +3,7 @@ import { useState } from "react";
 import '../Styles/LoginForm.css';
 import { useNavigate } from "react-router-dom";
 import TurnosList from './TurnoList';
+import { buildApiUrl } from '../config/api';
 
 export default function Login({}) {
     const [username, setUsername] = useState("");
@@ -13,7 +14,7 @@ export default function Login({}) {
         e.preventDefault();
    
         try {
-            const response = await fetch("http://localhost:8090/auth/login", {
+            const response = await fetch(buildApiUrl('/auth/login'), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),

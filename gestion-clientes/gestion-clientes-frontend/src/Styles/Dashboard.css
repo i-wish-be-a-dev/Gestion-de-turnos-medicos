@@ -1,0 +1,140 @@
+/* Estilos comunes para dashboards */
+
+.stat-card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card h5 {
+  color: #666;
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.stat-card h2 {
+  color: #1f73c7;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Estilos para tablas */
+.table {
+  margin-top: 20px;
+}
+
+.table thead {
+  background-color: #f8f9fa;
+}
+
+.table th {
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 12px;
+}
+
+/* Estilos para badges */
+.badge {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Estilos para tarjetas */
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 15px;
+}
+
+.card-header h5 {
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Estilos para formularios */
+.form-control {
+  border: 1px solid #dee2e6;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.form-control:focus {
+  border-color: #1f73c7;
+  box-shadow: 0 0 0 0.2rem rgba(31, 115, 199, 0.25);
+}
+
+.form-label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+/* Estilos para botones */
+.btn {
+  padding: 8px 16px;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #1f73c7;
+  border-color: #1f73c7;
+}
+
+.btn-primary:hover {
+  background-color: #1a5fa0;
+  border-color: #1a5fa0;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #333;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .stat-card h2 {
+    font-size: 24px;
+  }
+
+  .table {
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

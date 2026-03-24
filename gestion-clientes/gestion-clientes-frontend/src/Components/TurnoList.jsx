@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
+import TurnoSearch from './TurnoSearch';
+import { buildApiUrl } from '../config/api';
 
 const TurnosList = () => {
     const [turnos, setTurnos] = useState([]);
     const role = localStorage.getItem("role");
     const token = localStorage.getItem("token");
-    // const    
+    const [filterState, setFilterState] = useState('all');
 
-    console.log("Role:", role);
-    console.log("Token:", token);
+    //console.log("Role:", role);
+    //console.log("Token:", token);
     useEffect(() => {
         const fetchTurnos = async () => {
             try {
@@ -16,11 +18,11 @@ const TurnosList = () => {
 
 
                 if (role === "ADMIN") {
-                    url = "http://localhost:8090/admin/turnos";
+                    url = buildApiUrl('/admin/turnos');
                 } else if (role === "MEDICO") {
-                    url = "http://localhost:8090/medico/turnos";
+                    url = buildApiUrl('/medico/turnos');
                 } else {
-                    url = "http://localhost:8090/paciente/turnos";
+                    url = buildApiUrl('/paciente/turnos');
                 }
                 const res = await fetch(url, {
                     headers: {
@@ -32,18 +34,6 @@ const TurnosList = () => {
                 if (!res.ok) {
                     throw new Error(`Er2ror HTTP: ${res.status}`);
                 }
-
-   
-
-         console.log('Token:', token);
-         console.log('Role:', role);
-
-         // Optional: Save them to localStorage or state
-         localStorage.setItem('authToken', token);
-         localStorage.setItem('userRole', role);
-
-
-
 
 
                 const data = await res.json();
@@ -59,14 +49,27 @@ const TurnosList = () => {
     }, [role, token]);
 
     return (
-        <div>
-            <h2>Lista de Turnos</h2>
-            <ul>
+       
+       <div className='mb-3'>
+       <div className="container mt-3">
+          <h2>Lista de Turnos</h2>
+          
+            
+         
+         
+
+         
+         <ul className='list-group'>
                 {turnos.map((turno, idx) => (
-                    <li key={idx}>{JSON.stringify(turno)}</li>
+                    <li key={turno.id}>{JSON.stringify(turno)}</li>
                 ))}
-            </ul>
+         </ul>
+
+
+
+
         </div>
+    </div>
     );
 };
 
