@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
 
-	private final UsuarioService usuarioService;
+	private final AdminService usuarioService;
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
 	private final PasswordEncoder passwordEncoder;
@@ -32,7 +32,9 @@ public class AuthService {
 				.password(passwordEncoder.encode( request.getPassword()))
 				.name(request.getName())
 				.lastname(request.getLastname())
+				.dni(request.getDni())
 				.email(request.getEmail())
+				.telefono(request.getTelefono())
 				.rol(Role.USER) .build();
 		usuarioService.saveUsuario(user); 
 	return AuthResponse.builder()

@@ -44,14 +44,8 @@ public class TurnoServiceImp implements TurnoService {
 				.id(turno.getId())
 				.fechaTurno(turno.getFechaTurno())
 				.turnoState(turno.getTurnoState())
-				.paciente(UsuarioSimpleDto.builder()
-						.idUsuario(turno.getPaciente().getIdUsuario())
-						.username(turno.getPaciente().getUsername())
-						.build())
-				.medico(UsuarioSimpleDto.builder()
-						.idUsuario(turno.getMedico().getIdUsuario())
-						.username(turno.getMedico().getUsername())
-						.build())
+				.paciente(toUsuarioSimpleDto(turno.getPaciente()))
+				.medico(toUsuarioSimpleDto(turno.getMedico()))
 				.build()
 				).toList();
 		
@@ -68,14 +62,8 @@ public class TurnoServiceImp implements TurnoService {
 	            .id(turno.getId())
 	            .fechaTurno(turno.getFechaTurno())
 	            .turnoState(turno.getTurnoState())
-	            .paciente(UsuarioSimpleDto.builder()
-	                .idUsuario(turno.getPaciente().getIdUsuario())
-	                .username(turno.getPaciente().getUsername())
-	                .build())
-	            .medico(UsuarioSimpleDto.builder()
-	                .idUsuario(turno.getMedico().getIdUsuario())
-	                .username(turno.getMedico().getUsername())
-	                .build())
+	            .paciente(toUsuarioSimpleDto(turno.getPaciente()))
+	            .medico(toUsuarioSimpleDto(turno.getMedico()))
 	            .build();
 		 
 		
@@ -116,14 +104,8 @@ public class TurnoServiceImp implements TurnoService {
 					            .id(savedTurno.getId())
 					            .fechaTurno(savedTurno.getFechaTurno())
 					            .turnoState(savedTurno.getTurnoState())
-					            .paciente(UsuarioSimpleDto.builder()
-					                .idUsuario(paciente.getIdUsuario())
-					                .username(paciente.getUsername())
-					                .build())
-					            .medico(UsuarioSimpleDto.builder()
-					                .idUsuario(medico.getIdUsuario())
-					                .username(medico.getUsername())
-					                .build())
+					            .paciente(toUsuarioSimpleDto(paciente))
+					            .medico(toUsuarioSimpleDto(medico))
 					            .build();
 					
 				}
@@ -255,14 +237,8 @@ throw new RoleNotFitForThisTask("El usuario con id "+ id + " no es un paciente")
 	            .id(turno.getId())
 	            .fechaTurno(turno.getFechaTurno())
 	            .turnoState(turno.getTurnoState())
-	            .paciente(UsuarioSimpleDto.builder()
-	                .idUsuario(turno.getPaciente().getIdUsuario())
-	                .username(turno.getPaciente().getUsername())
-	                .build())
-	            .medico(UsuarioSimpleDto.builder()
-	                .idUsuario(turno.getMedico().getIdUsuario())
-	                .username(turno.getMedico().getUsername())
-	                .build())
+	            .paciente(toUsuarioSimpleDto(turno.getPaciente()))
+	            .medico(toUsuarioSimpleDto(turno.getMedico()))
 	            .build();
 	}
 
@@ -276,6 +252,19 @@ throw new RoleNotFitForThisTask("El usuario con id "+ id + " no es un paciente")
 		
 		
 		return null;
+	}
+
+	private UsuarioSimpleDto toUsuarioSimpleDto(Usuario usuario) {
+		return UsuarioSimpleDto.builder()
+				.idUsuario(usuario.getIdUsuario())
+				.username(usuario.getUsername())
+				.nombre(usuario.getName())
+				.apellido(usuario.getLastname())
+				.dni(usuario.getDni())
+				.email(usuario.getEmail())
+				.telefono(usuario.getTelefono())
+				.rol(usuario.getRol())
+				.build();
 	}
 
 	

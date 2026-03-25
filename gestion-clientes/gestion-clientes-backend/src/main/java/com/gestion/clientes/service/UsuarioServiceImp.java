@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class UsuarioServiceImp implements UsuarioService {
+public class UsuarioServiceImp implements AdminService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -60,7 +60,9 @@ public class UsuarioServiceImp implements UsuarioService {
        
           existente.setName(usuarioRequest.getName());
           existente.setLastname(usuarioRequest.getLastname());
+            existente.setDni(usuarioRequest.getDni());
           existente.setEmail(usuarioRequest.getEmail());
+            existente.setTelefono(usuarioRequest.getTelefono());
     return usuarioRepository.save(existente);
    
     }

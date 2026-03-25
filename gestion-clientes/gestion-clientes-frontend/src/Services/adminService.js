@@ -1,16 +1,57 @@
 import apiClient from './apiClient';
 
+function normalizeUsuario(usuario) {
+  return {
+    ...usuario,
+    id: usuario.id ?? usuario.idUsuario,
+    nombre: usuario.nombre ?? usuario.name ?? '',
+    apellido: usuario.apellido ?? usuario.lastname ?? '',
+    dni: usuario.dni ?? '',
+    email: usuario.email ?? '',
+    telefono: usuario.telefono ?? '',
+    rol: usuario.rol ?? '',
+  };
+}
+
+function toBackendUsuarioPayload(usuario) {
+  return {
+    name: usuario.nombre ?? usuario.name ?? '',
+    lastname: usuario.apellido ?? usuario.lastname ?? '',
+    dni: usuario.dni ?? '',
+    email: usuario.email ?? '',
+    telefono: usuario.telefono ?? '',
+  };
+}
+
 const adminService = {
   getUsuarios: async () => {
-    return apiClient.get('/admin/usuarios');
+    const response = await apiClient.get('/admin/usuarios');
+    return {
+      ...response,
+      data: Array.isArray(response.data)
+        ? response.data.map(normalizeUsuario)
+        : [],
+    };
   },
 
   getPacientes: async () => {
-    return apiClient.get('/admin/usuarios');
+    const response = await apiClient.get('/admin/pacientes');
+    return {
+      ...response,
+      data: Array.isArray(response.data)
+        ? response.data.map(normalizeUsuario)
+        : [],
+    };
   },
 
   getDoctores: async () => {
-    return apiClient.get('/admin/doctores');
+    const response = await apiClient.get('/admin/doctores');
+    return {
+      ...response,
+      data: Array.isArray(response.data)
+        ? response.data.map(normalizeUsuario)
+        : [],
+    };
   },
 
   createDoctor: async (doctorData) => {
@@ -18,11 +59,11 @@ const adminService = {
   },
 
   updateDoctor: async (id, doctorData) => {
-    return apiClient.put(`/admin/doctores/${id}`, doctorData);
+    return apiClient.put(`/admin/usuarios/${id}`, toBackendUsuarioPayload(doctorData));
   },
 
   deleteDoctor: async (id) => {
-    return apiClient.delete(`/admin/doctores/${id}`);
+    return apiClient.delete(`/admin/usuarios/${id}`);
   },
 
   getTurnos: async () => {
@@ -34,11 +75,11 @@ const adminService = {
   },
 
   updatePaciente: async (id, pacienteData) => {
-    return apiClient.put(`/api/pacientes/${id}`, pacienteData);
+    return apiClient.put(`/admin/usuarios/${id}`, toBackendUsuarioPayload(pacienteData));
   },
 
   deletePaciente: async (id) => {
-    return apiClient.delete(`/api/pacientes/${id}`);
+    return apiClient.delete(`/admin/usuarios/${id}`);
   },
 };
 
