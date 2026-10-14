@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Alert, Badge, Button, Container, Table } from 'react-bootstrap';
-import adminService from '../../Services/adminService';
 import turnoService from '../../Services/turnoService';
 
+// El admin tiene su propia vista (Admin/GestionTurnos); este listado queda para doctor y paciente
 const ROLE_CONFIG = {
-  ADMIN: {
-    title: 'Listado de Turnos',
-    emptyMessage: 'No hay turnos registrados',
-    columns: ['ID', 'Fecha', 'Hora', 'Médico', 'Paciente', 'Estado'],
-  },
   DOCTOR: {
     title: 'Mis Turnos',
     emptyMessage: 'No hay turnos registrados',
@@ -44,9 +39,7 @@ export default function TurnosList({ role: roleProp }) {
   const fetchTurnos = async () => {
     setLoading(true);
     try {
-      const response = role === 'ADMIN'
-        ? await adminService.getTurnos()
-        : await turnoService.getTurnosByRole(role);
+      const response = await turnoService.getTurnosByRole(role);
       setTurnos((response.data || []).map(normalizeTurno));
       setMessage(null);
     } catch (error) {
@@ -137,16 +130,6 @@ function renderCellsByRole(role, turno) {
     <td key="fecha">{formatDate(turno.fecha)}</td>,
     <td key="hora">{turno.hora}</td>,
   ];
-
-  if (role === 'ADMIN') {
-    return [
-      <td key="id">{turno.id}</td>,
-      ...commonCells,
-      <td key="doctor">{turno.doctor?.displayName}</td>,
-      <td key="paciente">{turno.paciente?.displayName}</td>,
-      <td key="estado"><Badge bg={getStatusColor(turno.estado)}>{turno.estado}</Badge></td>,
-    ];
-  }
 
   if (role === 'DOCTOR') {
     return [

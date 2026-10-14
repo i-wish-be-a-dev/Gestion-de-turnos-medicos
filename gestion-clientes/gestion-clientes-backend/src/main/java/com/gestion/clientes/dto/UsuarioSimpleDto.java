@@ -19,6 +19,8 @@ public class UsuarioSimpleDto {
 	private String dni;
 	private String email;
 	private String telefono;
+	private String especialidad;
+	private String matricula;
 	private Role rol;
 	private Long idUsuario;
 }

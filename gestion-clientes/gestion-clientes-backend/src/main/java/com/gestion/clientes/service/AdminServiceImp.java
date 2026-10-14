@@ -4,22 +4,32 @@
  */
 package com.gestion.clientes.service;
 
+import com.gestion.clientes.exception.ConflictException;
 import com.gestion.clientes.exception.ResourceNotFoundException;
 import com.gestion.clientes.model.Role;
 import com.gestion.clientes.model.Usuario;
+import com.gestion.clientes.repository.TurnoRepository;
 import com.gestion.clientes.repository.UsuarioRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 
 
 @Service
-public class UsuarioServiceImp implements AdminService {
+public class AdminServiceImp implements AdminService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
+
+    @Autowired
+    private TurnoRepository turnoRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public List<Usuario> listAllUsuarios() {
             return (List<Usuario>)
@@ -47,6 +57,10 @@ public class UsuarioServiceImp implements AdminService {
       
           Usuario existente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado" + id));
+          // los turnos guardan historial, no se borra un usuario que figure en alguno
+          if (turnoRepository.existsByMedico_IdUsuarioOrPaciente_IdUsuario(id, id)) {
+              throw new ConflictException("No se puede eliminar el usuario " + id + " porque tiene turnos asociados");
+          }
           usuarioRepository.deleteById(id);
        return existente;
     }
@@ -63,6 +77,8 @@ public class UsuarioServiceImp implements AdminService {
             existente.setDni(usuarioRequest.getDni());
           existente.setEmail(usuarioRequest.getEmail());
             existente.setTelefono(usuarioRequest.getTelefono());
+          existente.setEspecialidad(usuarioRequest.getEspecialidad());
+          existente.setMatricula(usuarioRequest.getMatricula());
     return usuarioRepository.save(existente);
    
     }
@@ -118,9 +134,37 @@ public class UsuarioServiceImp implements AdminService {
     return usuarioRepository.findAll().stream().filter(usuario -> usuario.getRol() == Role.PACIENTE).toList();
     }
 
+    @Override
+    public Usuario savePaciente(Usuario usuario) {
+        return createUsuarioConRol(usuario, Role.PACIENTE);
+    }
 
-	
-	
-	
+
+	@Override
+	public Usuario saveDoctor(Usuario usuario) {
+
+		return createUsuarioConRol(usuario, Role.DOCTOR);
+    }
+
+    @Override
+    public Usuario saveAdmin(Usuario usuario) {
+    
+        return createUsuarioConRol(usuario, Role.ADMIN);
+    }
+
+    @Override
+    public Usuario createUsuarioConRol(Usuario usuario, Role roleName) {
+        if (!StringUtils.hasText(usuario.getUsername()) || !StringUtils.hasText(usuario.getPassword())) {
+            throw new IllegalArgumentException("El usuario y la contraseña son obligatorios");
+        }
+        if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
+            throw new ConflictException("El usuario " + usuario.getUsername() + " ya existe");
+        }
+        usuario.setRol(roleName);
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        return usuarioRepository.save(usuario);
+    }
+
 }
+
 

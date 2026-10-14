@@ -24,14 +24,18 @@ export default function Login({}) {
                }
 
             const data = await response.json();
-            // Extract token and role from the response
-         const token = data.data.body.token;
-         const role = data.data.body.role;
+            const authPayload = extractAuthPayload(data);
+            const token = authPayload.token;
+            const role = normalizeRole(authPayload.role);
+
+            if (!token || !role) {
+                throw new Error("La respuesta de autenticación no contiene token o rol válido.");
+            }
 
             localStorage.setItem("token", token);
             localStorage.setItem("role", role);
 
-            navigate("/turnos");
+            navigate(getDashboardRouteByRole(role));
          } catch (error) {
             console.error("Error during login:", error);
         }
@@ -88,4 +92,37 @@ export default function Login({}) {
 );
 
 
+}
+
+function extractAuthPayload(data) {
+   return (
+      data?.data?.body ||
+      data?.data?.authResponse ||
+      data?.data ||
+      data?.body ||
+      data
+   );
+}
+
+function normalizeRole(role) {
+   const normalizedRole = role?.toUpperCase();
+
+   if (normalizedRole === "MEDICO") {
+      return "DOCTOR";
+   }
+
+   return normalizedRole;
+}
+
+function getDashboardRouteByRole(role) {
+   switch (role) {
+      case "ADMIN":
+         return "/admin/turnos";
+      case "DOCTOR":
+         return "/doctor/dashboard";
+      case "PACIENTE":
+         return "/paciente/dashboard";
+      default:
+         throw new Error(`Rol no soportado: ${role}`);
+   }
 }

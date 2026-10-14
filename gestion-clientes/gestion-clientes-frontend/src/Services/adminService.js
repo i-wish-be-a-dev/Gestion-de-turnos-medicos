@@ -1,86 +1,117 @@
 import apiClient from './apiClient';
 
-function normalizeUsuario(usuario) {
+export const TURNO_STATES = {
+  PENDIENTE: { label: 'Pendiente', variant: 'warning' },
+  VIGENTE: { label: 'Vigente', variant: 'primary' },
+  FINALIZADO: { label: 'Finalizado', variant: 'success' },
+  ELIMINADO: { label: 'Cancelado', variant: 'danger' },
+};
+
+export const ROLES = {
+  ADMIN: { label: 'Admin', variant: 'danger' },
+  DOCTOR: { label: 'Doctor', variant: 'primary' },
+  PACIENTE: { label: 'Paciente', variant: 'success' },
+  USER: { label: 'Sin validar', variant: 'secondary' },
+};
+
+const ROLE_ENDPOINTS = {
+  ADMIN: 'set-admin',
+  DOCTOR: 'set-doctor',
+  PACIENTE: 'set-paciente',
+};
+
+// El backend responde UsuarioSimpleDto: { idUsuario, username, nombre, apellido, ... }
+export function normalizeUsuario(usuario) {
+  if (!usuario) {
+    return null;
+  }
+
+  const nombre = usuario.nombre ?? usuario.name ?? '';
+  const apellido = usuario.apellido ?? usuario.lastname ?? '';
+
   return {
-    ...usuario,
-    id: usuario.id ?? usuario.idUsuario,
-    nombre: usuario.nombre ?? usuario.name ?? '',
-    apellido: usuario.apellido ?? usuario.lastname ?? '',
+    id: usuario.idUsuario ?? usuario.id,
+    username: usuario.username ?? '',
+    nombre,
+    apellido,
+    nombreCompleto: [nombre, apellido].filter(Boolean).join(' '),
     dni: usuario.dni ?? '',
     email: usuario.email ?? '',
     telefono: usuario.telefono ?? '',
+    especialidad: usuario.especialidad ?? '',
+    matricula: usuario.matricula ?? '',
     rol: usuario.rol ?? '',
   };
 }
 
-function toBackendUsuarioPayload(usuario) {
+export function displayName(usuario) {
+  return usuario?.nombreCompleto || usuario?.username || '-';
+}
+
+function normalizeTurno(turno) {
   return {
-    name: usuario.nombre ?? usuario.name ?? '',
-    lastname: usuario.apellido ?? usuario.lastname ?? '',
-    dni: usuario.dni ?? '',
-    email: usuario.email ?? '',
-    telefono: usuario.telefono ?? '',
+    id: turno.id,
+    fecha: turno.fechaTurno ? new Date(turno.fechaTurno) : null,
+    fechaTurno: turno.fechaTurno,
+    estado: turno.turnoState,
+    medico: normalizeUsuario(turno.medico),
+    paciente: normalizeUsuario(turno.paciente),
   };
 }
 
+// Lo que espera UsuarioRequestDto en el backend
+function toUsuarioRequest(usuario, { includeCredentials }) {
+  const payload = {
+    name: usuario.nombre?.trim() ?? '',
+    lastname: usuario.apellido?.trim() ?? '',
+    dni: usuario.dni?.trim() ?? '',
+    email: usuario.email?.trim() ?? '',
+    telefono: usuario.telefono?.trim() ?? '',
+    especialidad: usuario.especialidad?.trim() ?? '',
+    matricula: usuario.matricula?.trim() ?? '',
+  };
+
+  if (includeCredentials) {
+    payload.username = usuario.username?.trim() ?? '';
+    payload.password = usuario.password ?? '';
+  }
+
+  return payload;
+}
+
+const listOf = (mapper) => (response) => (Array.isArray(response?.data) ? response.data.map(mapper) : []);
+
 const adminService = {
-  getUsuarios: async () => {
-    const response = await apiClient.get('/admin/usuarios');
-    return {
-      ...response,
-      data: Array.isArray(response.data)
-        ? response.data.map(normalizeUsuario)
-        : [],
-    };
+  // Usuarios
+  getUsuarios: () => apiClient.get('/admin/usuarios').then(listOf(normalizeUsuario)),
+  getPacientes: () => apiClient.get('/admin/pacientes').then(listOf(normalizeUsuario)),
+  getDoctores: () => apiClient.get('/admin/doctores').then(listOf(normalizeUsuario)),
+
+  createPaciente: (data) =>
+    apiClient.post('/admin/pacientes', toUsuarioRequest(data, { includeCredentials: true })),
+  createDoctor: (data) =>
+    apiClient.post('/admin/doctores', toUsuarioRequest(data, { includeCredentials: true })),
+  updateUsuario: (id, data) =>
+    apiClient.put(`/admin/usuarios/${id}`, toUsuarioRequest(data, { includeCredentials: false })),
+  deleteUsuario: (id) => apiClient.delete(`/admin/usuarios/${id}`),
+
+  changeRole: (id, role) => {
+    const endpoint = ROLE_ENDPOINTS[role];
+    if (!endpoint) {
+      return Promise.reject(new Error(`Rol no soportado: ${role}`));
+    }
+    return apiClient.put(`/admin/${endpoint}/${id}`);
   },
 
-  getPacientes: async () => {
-    const response = await apiClient.get('/admin/pacientes');
-    return {
-      ...response,
-      data: Array.isArray(response.data)
-        ? response.data.map(normalizeUsuario)
-        : [],
-    };
-  },
+  // Turnos
+  getTurnos: () => apiClient.get('/admin/turnos').then(listOf(normalizeTurno)),
 
-  getDoctores: async () => {
-    const response = await apiClient.get('/admin/doctores');
-    return {
-      ...response,
-      data: Array.isArray(response.data)
-        ? response.data.map(normalizeUsuario)
-        : [],
-    };
-  },
-
-  createDoctor: async (doctorData) => {
-    return apiClient.post('/admin/doctores', doctorData);
-  },
-
-  updateDoctor: async (id, doctorData) => {
-    return apiClient.put(`/admin/usuarios/${id}`, toBackendUsuarioPayload(doctorData));
-  },
-
-  deleteDoctor: async (id) => {
-    return apiClient.delete(`/admin/usuarios/${id}`);
-  },
-
-  getTurnos: async () => {
-    return apiClient.get('/admin/turnos');
-  },
-
-  createPaciente: async (pacienteData) => {
-    return apiClient.post('/api/pacientes', pacienteData);
-  },
-
-  updatePaciente: async (id, pacienteData) => {
-    return apiClient.put(`/admin/usuarios/${id}`, toBackendUsuarioPayload(pacienteData));
-  },
-
-  deletePaciente: async (id) => {
-    return apiClient.delete(`/admin/usuarios/${id}`);
-  },
+  // fechaTurno con formato yyyy-MM-ddTHH:mm:ss (el que espera el @JsonFormat de Turno)
+  asignarTurno: (idPaciente, idMedico, fechaTurno) =>
+    apiClient.post(`/admin/asignar-turno/${idPaciente}/${idMedico}`, { fechaTurno }),
+  cancelarTurno: (id) => apiClient.put(`/admin/eliminar-turno/${id}`),
+  finalizarTurno: (id) => apiClient.put(`/admin/finalizar-turno/${id}`),
+  confirmarTurno: (id) => apiClient.put(`/admin/confirmar-turno/${id}`),
 };
 
 export default adminService;

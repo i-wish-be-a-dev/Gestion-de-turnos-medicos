@@ -9,71 +9,47 @@ function clearSessionAndRedirect() {
   window.location.replace("/");
 }
 
+async function request(method, endpoint, data) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(buildApiUrl(endpoint), {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+    body: data === undefined ? undefined : JSON.stringify(data),
+  });
+  return handleResponse(response);
+}
+
 const apiClient = {
-  // Métodos GET
-  get: async (endpoint) => {
-    const token = localStorage.getItem("token");
-    const response = await fetch(buildApiUrl(endpoint), {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
-    return handleResponse(response);
-  },
-
-  // Métodos POST
-  post: async (endpoint, data) => {
-    const token = localStorage.getItem("token");
-    const response = await fetch(buildApiUrl(endpoint), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-      body: JSON.stringify(data),
-    });
-    return handleResponse(response);
-  },
-
-  // Métodos PUT
-  put: async (endpoint, data) => {
-    const token = localStorage.getItem("token");
-    const response = await fetch(buildApiUrl(endpoint), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-      body: JSON.stringify(data),
-    });
-    return handleResponse(response);
-  },
-
-  // Métodos DELETE
-  delete: async (endpoint) => {
-    const token = localStorage.getItem("token");
-    const response = await fetch(buildApiUrl(endpoint), {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
-    return handleResponse(response);
-  },
+  get: (endpoint) => request("GET", endpoint),
+  post: (endpoint, data) => request("POST", endpoint, data),
+  put: (endpoint, data) => request("PUT", endpoint, data),
+  delete: (endpoint) => request("DELETE", endpoint),
 };
 
 // Manejo centralizado de respuestas
 const handleResponse = async (response) => {
+  const text = await response.text();
+  let body = null;
+  try {
+    body = text ? JSON.parse(text) : null;
+  } catch {
+    body = null;
+  }
+
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
+    // 401 = token vencido o inválido; un 403 es falta de permisos y no debe cerrar la sesión
+    if (response.status === 401) {
       clearSessionAndRedirect();
     }
-    throw new Error(`Error: ${response.status}`);
+    const error = new Error(body?.message || `Error: ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
-  return await response.json();
+
+  return body;
 };
 
 export default apiClient;

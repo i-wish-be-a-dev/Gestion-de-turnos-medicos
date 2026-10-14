@@ -54,6 +54,11 @@ public class Usuario implements UserDetails {
     private String email;
      @Column(name = "telefono")
     private String telefono;
+     // solo aplican a usuarios con rol DOCTOR
+     @Column(name = "especialidad")
+    private String especialidad;
+     @Column(name = "matricula")
+    private String matricula;
      @Enumerated(EnumType.STRING) 
      @Column(name = "rol")
      private Role rol;

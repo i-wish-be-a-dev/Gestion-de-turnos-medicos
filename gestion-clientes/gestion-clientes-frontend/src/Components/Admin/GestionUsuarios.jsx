@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Alert, Badge, Card, Col, Container, Form, Pagination, Row, Table } from 'react-bootstrap';
-import adminService from '../../Services/adminService';
+import { useEffect, useMemo, useState } from 'react';
+import { Alert, Badge, Button, Card, Col, Container, Form, Pagination, Row, Spinner, Table } from 'react-bootstrap';
+import adminService, { ROLES } from '../../Services/adminService';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20];
+// USER es el rol con el que se registra cualquiera: el admin lo valida asignándole uno de estos
+const ASSIGNABLE_ROLES = ['PACIENTE', 'DOCTOR', 'ADMIN'];
 
 export default function GestionUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [updatingId, setUpdatingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -17,32 +22,93 @@ export default function GestionUsuarios() {
 
   const fetchUsuarios = async () => {
     try {
-      const response = await adminService.getUsuarios();
-      const usuariosResponse = extractUsuarios(response.data);
-      setUsuarios(usuariosResponse);
-      setError(null);
+      setUsuarios(await adminService.getUsuarios());
     } catch (fetchError) {
-      console.error('Error al cargar usuarios:', fetchError);
-      setError('No se pudieron cargar los usuarios.');
+      setMessage({ type: 'danger', text: fetchError.message || 'No se pudieron cargar los usuarios.' });
       setUsuarios([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const totalPages = Math.max(1, Math.ceil(usuarios.length / pageSize));
+  const pendientes = usuarios.filter((usuario) => usuario.rol === 'USER').length;
+
+  const filteredUsuarios = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return usuarios.filter((usuario) => {
+      if (roleFilter && usuario.rol !== roleFilter) {
+        return false;
+      }
+      if (!term) {
+        return true;
+      }
+      return [usuario.username, usuario.nombreCompleto, usuario.email, usuario.dni]
+        .some((value) => value?.toLowerCase().includes(term));
+    });
+  }, [usuarios, search, roleFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsuarios.length / pageSize));
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const startIndex = (safeCurrentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const usuariosPaginados = usuarios.slice(startIndex, endIndex);
+  const usuariosPaginados = filteredUsuarios.slice(startIndex, endIndex);
 
   const handlePageSizeChange = (event) => {
     setPageSize(Number(event.target.value));
     setCurrentPage(1);
   };
 
+  const handleFilterChange = (setter) => (event) => {
+    setter(event.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleRoleChange = async (usuario, newRole) => {
+    if (!newRole || newRole === usuario.rol) {
+      return;
+    }
+    const roleLabel = ROLES[newRole].label;
+    if (!window.confirm(`¿Cambiar el rol de ${usuario.username} a ${roleLabel}?`)) {
+      return;
+    }
+
+    setUpdatingId(usuario.id);
+    try {
+      await adminService.changeRole(usuario.id, newRole);
+      setUsuarios((current) =>
+        current.map((item) => (item.id === usuario.id ? { ...item, rol: newRole } : item))
+      );
+      setMessage({ type: 'success', text: `${usuario.username} ahora es ${roleLabel}.` });
+    } catch (error) {
+      setMessage({ type: 'danger', text: error.message });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleDelete = async (usuario) => {
+    if (!window.confirm(`¿Eliminar al usuario ${usuario.username}? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    setUpdatingId(usuario.id);
+    try {
+      await adminService.deleteUsuario(usuario.id);
+      setUsuarios((current) => current.filter((item) => item.id !== usuario.id));
+      setMessage({ type: 'success', text: `Usuario ${usuario.username} eliminado.` });
+    } catch (error) {
+      setMessage({ type: 'danger', text: error.message });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   if (loading) {
-    return <div className="text-center mt-5">Cargando...</div>;
+    return (
+      <div className="text-center mt-5">
+        <Spinner animation="border" />
+      </div>
+    );
   }
 
   return (
@@ -52,14 +118,50 @@ export default function GestionUsuarios() {
         <Badge bg="secondary">Total: {usuarios.length}</Badge>
       </div>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {message && (
+        <Alert variant={message.type} dismissible onClose={() => setMessage(null)}>
+          {message.text}
+        </Alert>
+      )}
+
+      {pendientes > 0 && roleFilter !== 'USER' && (
+        <Alert variant="warning" className="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+          <span>
+            Hay <strong>{pendientes}</strong> usuario{pendientes > 1 ? 's' : ''} sin validar esperando que le asignes un rol.
+          </span>
+          <Button size="sm" variant="outline-dark" onClick={() => { setRoleFilter('USER'); setCurrentPage(1); }}>
+            Ver pendientes
+          </Button>
+        </Alert>
+      )}
 
       <Card>
         <Card.Body>
-          <Row className="align-items-center mb-3">
+          <Row className="g-3 align-items-end mb-3">
             <Col md={4}>
+              <Form.Group controlId="usuarios-search">
+                <Form.Label>Buscar</Form.Label>
+                <Form.Control
+                  placeholder="Usuario, nombre, email o DNI"
+                  value={search}
+                  onChange={handleFilterChange(setSearch)}
+                />
+              </Form.Group>
+            </Col>
+            <Col md={3}>
+              <Form.Group controlId="usuarios-role-filter">
+                <Form.Label>Rol</Form.Label>
+                <Form.Select value={roleFilter} onChange={handleFilterChange(setRoleFilter)}>
+                  <option value="">Todos</option>
+                  {Object.entries(ROLES).map(([value, { label }]) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={2}>
               <Form.Group controlId="usuarios-page-size">
-                <Form.Label>Usuarios por página</Form.Label>
+                <Form.Label>Por página</Form.Label>
                 <Form.Select value={pageSize} onChange={handlePageSizeChange}>
                   {PAGE_SIZE_OPTIONS.map((option) => (
                     <option key={option} value={option}>
@@ -69,9 +171,9 @@ export default function GestionUsuarios() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col md={8} className="text-md-end mt-3 mt-md-0">
+            <Col md={3} className="text-md-end">
               <span className="text-muted">
-                Mostrando {usuarios.length === 0 ? 0 : startIndex + 1} a {Math.min(endIndex, usuarios.length)} de {usuarios.length} usuarios
+                Mostrando {filteredUsuarios.length === 0 ? 0 : startIndex + 1} a {Math.min(endIndex, filteredUsuarios.length)} de {filteredUsuarios.length}
               </span>
             </Col>
           </Row>
@@ -84,30 +186,52 @@ export default function GestionUsuarios() {
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Rol</th>
-                <th>Estado</th>
+                <th style={{ width: 190 }}>Cambiar rol</th>
+                <th style={{ width: 100 }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {usuariosPaginados.length > 0 ? (
-                usuariosPaginados.map((usuario, index) => (
-                  <tr key={usuario.id ?? `${usuario.username}-${index}`}>
-                    <td>{usuario.id ?? '-'}</td>
+                usuariosPaginados.map((usuario) => (
+                  <tr key={usuario.id}>
+                    <td>{usuario.id}</td>
                     <td>{usuario.username}</td>
-                    <td>{usuario.nombreCompleto}</td>
-                    <td>{usuario.email}</td>
+                    <td>{usuario.nombreCompleto || '-'}</td>
+                    <td>{usuario.email || '-'}</td>
                     <td>
-                      <Badge bg={getRoleVariant(usuario.role)}>{usuario.role}</Badge>
+                      <Badge bg={ROLES[usuario.rol]?.variant || 'secondary'}>
+                        {ROLES[usuario.rol]?.label || usuario.rol}
+                      </Badge>
                     </td>
                     <td>
-                      <Badge bg={usuario.activo ? 'success' : 'danger'}>
-                        {usuario.activo ? 'Activo' : 'Inactivo'}
-                      </Badge>
+                      <Form.Select
+                        size="sm"
+                        aria-label={`Cambiar rol de ${usuario.username}`}
+                        value=""
+                        disabled={updatingId === usuario.id}
+                        onChange={(event) => handleRoleChange(usuario, event.target.value)}
+                      >
+                        <option value="">{usuario.rol === 'USER' ? 'Validar como...' : 'Cambiar a...'}</option>
+                        {ASSIGNABLE_ROLES.filter((role) => role !== usuario.rol).map((role) => (
+                          <option key={role} value={role}>{ROLES[role].label}</option>
+                        ))}
+                      </Form.Select>
+                    </td>
+                    <td>
+                      <Button
+                        size="sm"
+                        variant="outline-danger"
+                        disabled={updatingId === usuario.id}
+                        onClick={() => handleDelete(usuario)}
+                      >
+                        Eliminar
+                      </Button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center">
+                  <td colSpan="7" className="text-center text-muted">
                     No hay usuarios para mostrar.
                   </td>
                 </tr>
@@ -115,7 +239,7 @@ export default function GestionUsuarios() {
             </tbody>
           </Table>
 
-          {usuarios.length > pageSize && (
+          {filteredUsuarios.length > pageSize && (
             <Pagination className="justify-content-center mb-0">
               <Pagination.First onClick={() => setCurrentPage(1)} disabled={safeCurrentPage === 1} />
               <Pagination.Prev onClick={() => setCurrentPage(safeCurrentPage - 1)} disabled={safeCurrentPage === 1} />
@@ -136,59 +260,6 @@ export default function GestionUsuarios() {
       </Card>
     </Container>
   );
-}
-
-function extractUsuarios(data) {
-  if (Array.isArray(data)) {
-    return data.map(normalizeUsuario);
-  }
-
-  if (Array.isArray(data?.content)) {
-    return data.content.map(normalizeUsuario);
-  }
-
-  if (Array.isArray(data?.usuarios)) {
-    return data.usuarios.map(normalizeUsuario);
-  }
-
-  return [];
-}
-
-function normalizeUsuario(usuario) {
-  const nombreCompleto =
-    usuario.nombreCompleto ||
-    usuario.fullName ||
-    [usuario.nombre, usuario.apellido].filter(Boolean).join(' ') ||
-    '-';
-
-  const role = usuario.role || usuario.rol || '-';
-  const username = usuario.username || usuario.userName || usuario.nombreUsuario || '-';
-  const email = usuario.email || usuario.correo || '-';
-  const activo =
-    typeof usuario.activo === 'boolean'
-      ? usuario.activo
-      : typeof usuario.enabled === 'boolean'
-        ? usuario.enabled
-        : usuario.estado === 'ACTIVO';
-
-  return {
-    id: usuario.id,
-    username,
-    nombreCompleto,
-    email,
-    role,
-    activo,
-  };
-}
-
-function getRoleVariant(role) {
-  const roleVariants = {
-    ADMIN: 'danger',
-    DOCTOR: 'primary',
-    PACIENTE: 'success',
-  };
-
-  return roleVariants[role] || 'secondary';
 }
 
 function buildPageNumbers(currentPage, totalPages) {

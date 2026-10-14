@@ -1,5 +1,6 @@
 package com.gestion.clientes.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,6 @@ import com.gestion.clientes.exception.ResourceNotFoundException;
 import com.gestion.clientes.jwt.JwtService;
 import com.gestion.clientes.model.Role;
 import com.gestion.clientes.model.Usuario;
-import com.gestion.clientes.repository.UsuarioRepository;
 import com.gestion.clientes.response.AuthResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,9 @@ public class AuthService {
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
 	private final PasswordEncoder passwordEncoder;
+
+	@Value("${app.auth.temporal-password}")
+	private String temporalPasswordProperty;
 	
 	public AuthResponse register(RegisterRequest request) {
 		Usuario user = Usuario.builder() 
@@ -60,5 +63,8 @@ public class AuthService {
 				.role(role)
 				.build();
 	}
+
+
+
 
 }

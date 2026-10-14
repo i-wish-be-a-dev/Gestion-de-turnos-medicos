@@ -13,8 +13,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+import com.gestion.clientes.dto.DtoMapper;
 import com.gestion.clientes.dto.TurnoResponseDto;
 import com.gestion.clientes.dto.UsuarioSimpleDto;
+import com.gestion.clientes.exception.ConflictException;
 import com.gestion.clientes.exception.ResourceNotFoundException;
 import com.gestion.clientes.exception.RoleNotFitForThisTask;
 import com.gestion.clientes.model.Role;
@@ -71,7 +73,14 @@ public class TurnoServiceImp implements TurnoService {
 
 	@Override
 	public TurnoResponseDto asignarTurno(Long idPaciente, Long idMedico, Turno data) {
-	
+
+		if (data == null || data.getFechaTurno() == null) {
+			throw new IllegalArgumentException("La fecha del turno es obligatoria");
+		}
+		if (data.getFechaTurno().isBefore(LocalDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires")))) {
+			throw new IllegalArgumentException("No se puede asignar un turno en una fecha pasada");
+		}
+
 		Usuario medico = usuarioRepository.findById(idMedico)
 				.orElseThrow(
 						() ->  new ResourceNotFoundException("Medico no encontrado"));
@@ -84,35 +93,29 @@ public class TurnoServiceImp implements TurnoService {
 			
 			if(paciente.getRol().equals(Role.PACIENTE)) {
 			
-				LocalDateTime inicio = data.getFechaTurno();
-				LocalDateTime fin = inicio.plusMinutes(30);
-				
-				List <Turno> conflictosByMedico= turnoRepository.findTurnosSuperpuestosByMedico(idMedico, inicio, fin);
-				List <Turno> conflictosByPaciente= turnoRepository.findTurnosSuperpuestosByPaciente(idPaciente, inicio, fin);
-				
-				if(conflictosByMedico.isEmpty() && conflictosByPaciente.isEmpty() ) {
-					Turno turno = 
-							Turno.builder()
-							.medico(medico)
-							.paciente(paciente)
-							.fechaTurno(data.getFechaTurno())
-							.turnoState(TurnoState.VIGENTE)
-							.build();
-					  Turno savedTurno = turnoRepository.save(turno);
-					  
-					    return TurnoResponseDto.builder()
-					            .id(savedTurno.getId())
-					            .fechaTurno(savedTurno.getFechaTurno())
-					            .turnoState(savedTurno.getTurnoState())
-					            .paciente(toUsuarioSimpleDto(paciente))
-					            .medico(toUsuarioSimpleDto(medico))
-					            .build();
-					
+				// los turnos duran 30 minutos: choca cualquier turno que empiece a menos de 30 minutos de este
+				LocalDateTime inicio = data.getFechaTurno().minusMinutes(30);
+				LocalDateTime fin = data.getFechaTurno().plusMinutes(30);
+
+				List <Turno> conflictosByMedico= turnoRepository.findTurnosSuperpuestosByMedico(idMedico, inicio, fin, TurnoState.ELIMINADO);
+				List <Turno> conflictosByPaciente= turnoRepository.findTurnosSuperpuestosByPaciente(idPaciente, inicio, fin, TurnoState.ELIMINADO);
+
+				if (!conflictosByMedico.isEmpty()) {
+					throw new ConflictException("El medico ya tiene un turno en ese horario");
 				}
-				
-				
-				
-			
+				if (!conflictosByPaciente.isEmpty()) {
+					throw new ConflictException("El paciente ya tiene un turno en ese horario");
+				}
+
+				Turno turno =
+						Turno.builder()
+						.medico(medico)
+						.paciente(paciente)
+						.fechaTurno(data.getFechaTurno())
+						.turnoState(TurnoState.VIGENTE)
+						.build();
+
+				return DtoMapper.toTurnoResponseDto(turnoRepository.save(turno));
 			}
 			else {
 
@@ -131,6 +134,9 @@ throw new RoleNotFitForThisTask("El usuario con id "+ idPaciente + " no es un pa
 		Turno turnoExistente = turnoRepository.findById(id)
 				.orElseThrow(
 						() -> new ResourceNotFoundException("Turno inexistente"));
+		if (turnoExistente.getTurnoState() == TurnoState.ELIMINADO || turnoExistente.getTurnoState() == TurnoState.FINALIZADO) {
+			throw new ConflictException("El turno " + id + " ya se encuentra " + turnoExistente.getTurnoState());
+		}
 		turnoExistente.setTurnoState(TurnoState.ELIMINADO);
 		return turnoRepository.save(turnoExistente);
 	}
@@ -231,40 +237,40 @@ throw new RoleNotFitForThisTask("El usuario con id "+ id + " no es un paciente")
 		Turno turno = turnoRepository.findById(id)
 				.orElseThrow(
 						() -> new ResourceNotFoundException("Turno inexistente"));
+		if (turno.getTurnoState() != TurnoState.VIGENTE) {
+			throw new ConflictException("Solo se puede finalizar un turno VIGENTE");
+		}
 		turno.setTurnoState(TurnoState.FINALIZADO);
-		
-	    return TurnoResponseDto.builder()
-	            .id(turno.getId())
-	            .fechaTurno(turno.getFechaTurno())
-	            .turnoState(turno.getTurnoState())
-	            .paciente(toUsuarioSimpleDto(turno.getPaciente()))
-	            .medico(toUsuarioSimpleDto(turno.getMedico()))
-	            .build();
+
+	    return DtoMapper.toTurnoResponseDto(turnoRepository.save(turno));
+	}
+
+	@Override
+	public TurnoResponseDto confirmarTurno(Long id) {
+		Turno turno = turnoRepository.findById(id)
+				.orElseThrow(
+						() -> new ResourceNotFoundException("Turno inexistente"));
+		if (turno.getTurnoState() != TurnoState.PENDIENTE) {
+			throw new ConflictException("Solo se puede confirmar un turno PENDIENTE");
+		}
+		turno.setTurnoState(TurnoState.VIGENTE);
+
+		return DtoMapper.toTurnoResponseDto(turnoRepository.save(turno));
 	}
 
 	@Override
 	public TurnoResponseDto eliminarTurnoComoDoctor(Long id) {
-
-		Turno turno = turnoRepository.findById(id)
-				.orElseThrow(
-						() -> new ResourceNotFoundException("Turno inexistente"));
-		
-		
-		
-		return null;
+		// el doctor puede cancelar en cualquier momento, sin la restriccion de 48 hs del paciente
+		return DtoMapper.toTurnoResponseDto(deleteTurno(id));
 	}
 
+	//esto esta re desubicado pero lo dejo aca para no olvidarlo, es para convertir un usuario a un dto mas simple que se muestra en los turnos
+	//el usuario podria contener mas cosas despues, y no quiero modificar el performance 
+	// de los turnos por eso hago esta conversion a un dto mas simple,
+	//  ademas de que el usuario tiene la contraseña y no quiero mostrarla en los turnos
+
 	private UsuarioSimpleDto toUsuarioSimpleDto(Usuario usuario) {
-		return UsuarioSimpleDto.builder()
-				.idUsuario(usuario.getIdUsuario())
-				.username(usuario.getUsername())
-				.nombre(usuario.getName())
-				.apellido(usuario.getLastname())
-				.dni(usuario.getDni())
-				.email(usuario.getEmail())
-				.telefono(usuario.getTelefono())
-				.rol(usuario.getRol())
-				.build();
+		return DtoMapper.toUsuarioSimpleDto(usuario);
 	}
 
 	

@@ -33,6 +33,8 @@ public interface TurnoService {
 	Turno eliminarTurnoComoUsuario(Long id);
 	
 	TurnoResponseDto finalizarTurno(Long id);
+
+	TurnoResponseDto confirmarTurno(Long id);
 	
 	TurnoResponseDto eliminarTurnoComoDoctor(Long id);
 

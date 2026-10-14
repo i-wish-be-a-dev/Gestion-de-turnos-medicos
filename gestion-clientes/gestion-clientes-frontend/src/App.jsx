@@ -7,7 +7,6 @@ import Login from './Components/Auth/Login'
 import { ProtectedRoute } from './Components/ProtectedRoute'
 
 // Admin Components
-import AdminDashboard from './Components/Admin/AdminDashboard'
 import GestionTurnos from './Components/Admin/GestionTurnos'
 import GestionPacientes from './Components/Admin/GestionPacientes'
 import GestionDoctores from './Components/Admin/GestionDoctores'
