@@ -7,12 +7,19 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.gestion.clientes.jwt.JwtAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.Arrays;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,16 +37,22 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		
 		return http
+				.cors(withDefaults())
 				.csrf(
 						csrf -> csrf.disable())
 				.authorizeHttpRequests(authRequest ->
 				authRequest
-				.requestMatchers("/auth/**").permitAll()
+				.requestMatchers("/auth/**", "/error").permitAll()
 				.requestMatchers("/admin/**").hasAuthority("ADMIN")
 				.requestMatchers("/paciente/**").hasAnyAuthority("PACIENTE", "ADMIN")
 				.requestMatchers("/doctor/**").hasAnyAuthority("DOCTOR", "ADMIN")
 				.anyRequest().authenticated()
 				)
+				// sin token valido responde 401 (por defecto seria 403), asi el front distingue
+				// "sesion vencida" de "no tenes permiso"
+				.exceptionHandling(exceptions ->
+				exceptions
+				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
 				.sessionManagement(sessionManager ->
 				sessionManager
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -49,7 +62,17 @@ public class SecurityConfig {
 		
 	}
 	
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
 	
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+		corsConfiguration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource ();
+		source.registerCorsConfiguration("/**", corsConfiguration);
+		return source;
+	}
 	
 
 }

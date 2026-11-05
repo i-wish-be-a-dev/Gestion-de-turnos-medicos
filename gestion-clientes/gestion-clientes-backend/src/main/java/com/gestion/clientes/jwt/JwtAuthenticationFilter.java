@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.gestion.clientes.exception.ResourceNotFoundException;
+
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,13 +44,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 			
 		}
+		// un token vencido, mal formado o de un usuario borrado no corta la cadena:
+		// la request sigue sin autenticar y el entry point responde 401
+		try {
 		username = jwtService.getUsernameFromToken(token);
-		
+
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			
+
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			
-			if(jwtService.isTokenValid(token, userDetails)) 
+
+			if(jwtService.isTokenValid(token, userDetails))
 			{
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 						userDetails,
@@ -56,6 +62,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 		SecurityContextHolder.getContext().setAuthentication(authToken);
 			}
+		}
+		} catch (JwtException | IllegalArgumentException | ResourceNotFoundException ex) {
+			SecurityContextHolder.clearContext();
 		}
 		
 		

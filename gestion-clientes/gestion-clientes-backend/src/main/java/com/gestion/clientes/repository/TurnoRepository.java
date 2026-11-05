@@ -27,28 +27,35 @@ public interface TurnoRepository extends JpaRepository<Turno,Long> {
 	List<Turno> findByMedicoIdAndTurnoState(@Param("usuarioId") Long usuarioId, @Param("estado") TurnoState estado);
 
 	
+	// inicio y fin son exclusivos: un turno que empieza justo cuando termina otro no se superpone
 	@Query("""
-		    SELECT t FROM Turno t 
-		    WHERE t.medico.idUsuario = :idMedico 
-		    AND t.fechaTurno < :fin 
-		    AND t.fechaTurno >= :inicio
+		    SELECT t FROM Turno t
+		    WHERE t.medico.idUsuario = :idMedico
+		    AND t.fechaTurno < :fin
+		    AND t.fechaTurno > :inicio
+		    AND t.turnoState <> :excluido
 		""")
 	List<Turno> findTurnosSuperpuestosByMedico(@Param("idMedico") Long idMedico,
             @Param("inicio") LocalDateTime inicio,
-            @Param("fin") LocalDateTime fin);
-	
-	
-	
+            @Param("fin") LocalDateTime fin,
+            @Param("excluido") TurnoState excluido);
+
+
+
 
 	@Query("""
-		    SELECT t FROM Turno t 
-		    WHERE t.paciente.idUsuario = :idPaciente 
-		    AND t.fechaTurno < :fin 
-		    AND t.fechaTurno >= :inicio
+		    SELECT t FROM Turno t
+		    WHERE t.paciente.idUsuario = :idPaciente
+		    AND t.fechaTurno < :fin
+		    AND t.fechaTurno > :inicio
+		    AND t.turnoState <> :excluido
 		""")
 	List<Turno> findTurnosSuperpuestosByPaciente(@Param("idPaciente") Long idPaciente,
             @Param("inicio") LocalDateTime inicio,
-            @Param("fin") LocalDateTime fin);
+            @Param("fin") LocalDateTime fin,
+            @Param("excluido") TurnoState excluido);
+
+	boolean existsByMedico_IdUsuarioOrPaciente_IdUsuario(Long idMedico, Long idPaciente);
 	
 	}
 	

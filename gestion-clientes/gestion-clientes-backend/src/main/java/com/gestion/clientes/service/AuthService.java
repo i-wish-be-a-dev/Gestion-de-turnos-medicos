@@ -1,5 +1,6 @@
 package com.gestion.clientes.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,6 @@ import com.gestion.clientes.exception.ResourceNotFoundException;
 import com.gestion.clientes.jwt.JwtService;
 import com.gestion.clientes.model.Role;
 import com.gestion.clientes.model.Usuario;
-import com.gestion.clientes.repository.UsuarioRepository;
 import com.gestion.clientes.response.AuthResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -21,10 +21,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
 
-	private final UsuarioService usuarioService;
+	private final AdminService usuarioService;
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
 	private final PasswordEncoder passwordEncoder;
+
+	@Value("${app.auth.temporal-password}")
+	private String temporalPasswordProperty;
 	
 	public AuthResponse register(RegisterRequest request) {
 		Usuario user = Usuario.builder() 
@@ -32,7 +35,9 @@ public class AuthService {
 				.password(passwordEncoder.encode( request.getPassword()))
 				.name(request.getName())
 				.lastname(request.getLastname())
+				.dni(request.getDni())
 				.email(request.getEmail())
+				.telefono(request.getTelefono())
 				.rol(Role.USER) .build();
 		usuarioService.saveUsuario(user); 
 	return AuthResponse.builder()
@@ -45,10 +50,21 @@ public class AuthService {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 	
 		UserDetails user = usuarioService.findByUsername(request.getUsername());
+		 
+		String role = user.getAuthorities()
+                   .stream()
+                   .findFirst()
+                   .map(auth -> auth.getAuthority())
+                   .orElse(null);
+		   
 		String token = jwtService.getToken(user);
 		return AuthResponse.builder()
 				.token(token)
+				.role(role)
 				.build();
 	}
+
+
+
 
 }
